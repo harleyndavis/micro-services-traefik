@@ -1,4 +1,4 @@
-# Micro Projects with Traefik
+# Micro Services with Traefik
 
 This repository contains a small Traefik reverse-proxy stack that supports both local development (using locally-trusted certs) and production deployment (using Let's Encrypt). The same `docker-compose.yml` handles both — the difference is entirely in `.env`.
 
