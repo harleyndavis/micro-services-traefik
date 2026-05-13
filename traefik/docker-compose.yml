@@ -79,11 +79,12 @@ services:
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/dynamic/dashboard-users.htpasswd"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"
 
-  # Whoami application
+  # Whoami application — only started when the "dev" profile is active
   whoami:
     image: traefik/whoami
     container_name: whoami
     restart: unless-stopped
+    profiles: [dev]
     networks:
       - proxy
     labels:
