@@ -1,3 +1,9 @@
+env_file:
+  - path: ../traefik/.env
+    required: false
+  - path: .env
+    required: false
+
 services:
   db:
     image: postgres:15-alpine
@@ -38,6 +44,7 @@ services:
       - "traefik.http.routers.shortener.rule=(Host(`short.${TRAEFIK_DASHBOARD_HOST:-dev.localhost}`) || PathPrefix(`/api/links`))"
       - "traefik.http.routers.shortener.entrypoints=websecure"
       - "traefik.http.routers.shortener.tls=true"
+      - "traefik.http.routers.shortener.tls.certresolver=${CERT_RESOLVER}"
       - "traefik.http.services.shortener.loadbalancer.server.port=8000"
     volumes:
       - ./:/app

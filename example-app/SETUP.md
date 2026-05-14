@@ -10,16 +10,7 @@ Follow these steps to get your URL shortener app running.
 
 ## Step 1: Prepare Your Environment Files
 
-### In `traefik/.env`
-
-Make sure you have these variables set (they should already be there from the Traefik setup):
-
-```env
-TRAEFIK_DASHBOARD_HOST=dev.localhost
-ACME_EMAIL=
-CERT_RESOLVER=
-DEBUG=True
-```
+`traefik/.env` is the single source of truth for `TRAEFIK_DASHBOARD_HOST`, `ACME_EMAIL`, and `CERT_RESOLVER`. The example-app compose reads it automatically via `env_file` — you do **not** need to duplicate those values here.
 
 ### In `example-app/.env`
 
@@ -30,19 +21,22 @@ cd example-app
 cp .env.example .env
 ```
 
-The defaults should work for local development, but feel free to customize:
+The defaults work for local development. Edit only the app-specific values:
 
 ```env
 DEBUG=True
 DJANGO_SECRET_KEY=your-secret-key-here
-ALLOWED_HOSTS=localhost,127.0.0.1,shortener.dev.localhost
+ALLOWED_HOSTS=localhost,127.0.0.1,short.dev.localhost
 DB_HOST=db
 DB_PORT=5432
 DB_NAME=shortener
 DB_USER=postgres
 DB_PASSWORD=postgres
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1
+CORS_ALLOWED_ORIGINS=https://short.dev.localhost,http://localhost:3000
+CSRF_TRUSTED_ORIGINS=https://short.dev.localhost,http://localhost
 ```
+
+For production, update `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` to use your real domain. `TRAEFIK_DASHBOARD_HOST` and `CERT_RESOLVER` are already set in `traefik/.env` and will be picked up automatically.
 
 ## Step 2: Create the Traefik Network (if not already created)
 

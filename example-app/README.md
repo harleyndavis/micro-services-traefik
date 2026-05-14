@@ -21,22 +21,9 @@ cd example-app
 cp .env.example .env
 ```
 
-### 2. Update your parent `.env` to include shortener variables
+### 2. Ensure `traefik/.env` is configured
 
-In `traefik/.env` (or your root `.env`), add or ensure these are set:
-
-```env
-# Existing Traefik settings
-TRAEFIK_DASHBOARD_HOST=dev.localhost  # or your domain
-ACME_EMAIL=                            # empty for local, your@email.com for prod
-CERT_RESOLVER=                         # empty for local, letsencrypt for prod
-
-# Shortener app settings (optional, uses defaults if not set)
-DB_NAME=shortener
-DB_USER=postgres
-DB_PASSWORD=postgres
-DEBUG=True
-```
+The compose file reads `../traefik/.env` automatically for `TRAEFIK_DASHBOARD_HOST`, `ACME_EMAIL`, and `CERT_RESOLVER`. No changes to `traefik/.env` are needed beyond the standard Traefik setup — app-specific settings live in `example-app/.env`.
 
 ### 3. Make sure the Traefik `proxy` network exists
 
@@ -51,13 +38,7 @@ docker network create proxy
 From the `example-app` directory:
 
 ```bash
-docker compose --env-file .env -f docker-compose.yml up -d
-```
-
-Or with your parent `.env`:
-
-```bash
-docker compose --env-file ../traefik/.env -f docker-compose.yml up -d
+docker compose up -d
 ```
 
 ### 5. Run migrations (first time only)
