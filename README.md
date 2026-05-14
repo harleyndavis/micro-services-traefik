@@ -6,10 +6,9 @@ Current layout:
 
 ```text
 docs/
-  vps-setup.md
   automating-deployment-summary.md
   production-hardening.md
-example-app/
+  runbook.md
 traefik/
   .env.example
   docker-compose.yml
@@ -18,6 +17,10 @@ traefik/
     dashboard-users.htpasswd.example
     tls.yaml
   letsencrypt/
+url_shortener/        ← example Django microservice
+  docker-compose.yml
+  Dockerfile
+  .env.example
 ```
 
 The active Traefik stack lives in `traefik/`.

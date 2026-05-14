@@ -4,60 +4,63 @@ A Django-based URL shortener microservice with a clean web UI and REST API. This
 
 ## Features
 
-- 🔗 Create shortened URLs with auto-generated 6-character codes
-- 📊 Track click statistics for each shortened link
-- 🎨 Clean, responsive web interface
-- 🔌 REST API for programmatic access
-- 📦 PostgreSQL database for persistence
-- 🐳 Docker & Docker Compose ready
-- 🔀 Traefik integration for reverse proxy routing
+- Create shortened URLs with auto-generated 6-character codes
+- Track click statistics for each shortened link
+- Clean, responsive web interface
+- REST API for programmatic access
+- PostgreSQL database for persistence
+- Docker & Docker Compose ready
+- Traefik integration for reverse proxy routing
 
 ## Quick Start
 
 ### 1. Copy the environment file
 
 ```bash
-cd example-app
+cd url_shortener
 cp .env.example .env
 ```
 
-### 2. Ensure `traefik/.env` is configured
+Edit `.env` if you need non-default values. At minimum, set a real `DJANGO_SECRET_KEY` for any non-throwaway deployment.
 
-The compose file reads `../traefik/.env` automatically for `TRAEFIK_DASHBOARD_HOST`, `ACME_EMAIL`, and `CERT_RESOLVER`. No changes to `traefik/.env` are needed beyond the standard Traefik setup — app-specific settings live in `example-app/.env`.
-
-### 3. Make sure the Traefik `proxy` network exists
-
-From the traefik directory:
+### 2. Make sure the Traefik `proxy` network exists
 
 ```bash
 docker network create proxy
 ```
 
-### 4. Start the stack
+Skip this if you already have the Traefik stack running — it creates the network automatically.
 
-From the `example-app` directory:
+### 3. Make sure the Traefik stack is running
+
+The app registers itself with Traefik via Docker labels. Traefik must be up first.
+
+```bash
+cd ../traefik
+docker compose --env-file .env up -d
+```
+
+### 4. Start the app stack
+
+From the `url_shortener` directory:
 
 ```bash
 docker compose up -d
 ```
 
-### 5. Run migrations (first time only)
+Migrations and static file collection run automatically on startup. No manual steps needed.
 
-```bash
-docker compose -f docker-compose.yml exec app python manage.py migrate
-```
+### 5. Access the app
 
-### 6. Access the app
-
-- **Web UI**: `https://shortener.dev.localhost` (local) or `https://shortener.yourdomain.com` (production)
-- **API**: `https://shortener.dev.localhost/api/`
+- **Web UI**: `https://short.dev.localhost` (local) or `https://short.yourdomain.com` (production)
+- **API**: `https://short.dev.localhost/api/`
 
 ## API Endpoints
 
 ### Shorten a URL
 
 ```bash
-curl -X POST https://shortener.dev.localhost/api/links/shorten/ \
+curl -X POST https://short.dev.localhost/api/links/shorten/ \
   -H "Content-Type: application/json" \
   -d '{"original_url": "https://example.com/very/long/url"}'
 ```
@@ -68,7 +71,7 @@ Response:
   "id": 1,
   "original_url": "https://example.com/very/long/url",
   "short_code": "abc123",
-  "short_url": "https://shortener.dev.localhost/api/s/abc123",
+  "short_url": "https://short.dev.localhost/api/s/abc123",
   "clicks": 0,
   "created_at": "2026-05-01T12:00:00Z"
 }
@@ -77,13 +80,13 @@ Response:
 ### List all shortened links
 
 ```bash
-curl https://shortener.dev.localhost/api/links/list_all/
+curl https://short.dev.localhost/api/links/list_all/
 ```
 
 ### Get statistics
 
 ```bash
-curl https://shortener.dev.localhost/api/links/stats/
+curl https://short.dev.localhost/api/links/stats/
 ```
 
 Response:
@@ -97,14 +100,14 @@ Response:
 ### Redirect via short link
 
 ```bash
-# This will redirect to the original URL and increment the click counter
-curl -L https://shortener.dev.localhost/s/abc123
+# Redirects to the original URL and increments the click counter
+curl -L https://short.dev.localhost/s/abc123
 ```
 
 ## Project Structure
 
 ```
-example-app/
+url_shortener/
 ├── shortener/              # Django project config
 │   ├── settings.py         # Settings (uses env vars)
 │   ├── urls.py             # URL routing
@@ -116,12 +119,19 @@ example-app/
 │   └── urls.py             # App-level routing
 ├── templates/
 │   └── index.html          # Single-page web UI
+├── static/                 # Source static files (served via collectstatic)
 ├── manage.py               # Django CLI
 ├── Dockerfile              # Container image definition
-├── docker-compose.yml      # Local compose setup
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
+├── docker-compose.yml      # Compose stack (app + postgres)
+├── .env.example            # Environment variable reference
+└── requirements.txt        # Python dependencies
 ```
+
+### Volumes
+
+- `./:/app` — bind-mounts source code for live reloading during development
+- `staticfiles:/app/staticfiles` — named volume; `collectstatic` writes here at startup so the bind-mount's host permissions don't interfere
+- `postgres_data:/var/lib/postgresql/data` — persistent database storage
 
 ## Development
 
@@ -138,7 +148,7 @@ example-app/
    pip install -r requirements.txt
    ```
 
-3. Create a `.env` file with your settings or run with defaults
+3. Create a `.env` file with your settings or run with defaults.
 
 4. Run migrations:
    ```bash
@@ -155,23 +165,24 @@ example-app/
 ### Viewing logs
 
 ```bash
-docker compose -f docker-compose.yml logs -f app
-docker compose -f docker-compose.yml logs -f db
+docker compose logs -f app
+docker compose logs -f db
 ```
 
 ### Stopping the stack
 
 ```bash
-docker compose -f docker-compose.yml down
+docker compose down
 ```
 
 ### Resetting the database
 
 ```bash
-docker compose -f docker-compose.yml down -v
-docker compose -f docker-compose.yml up -d
-docker compose -f docker-compose.yml exec app python manage.py migrate
+docker compose down -v
+docker compose up -d
 ```
+
+Migrations run automatically on the next startup.
 
 ## Production Hardening
 
@@ -180,9 +191,10 @@ When deploying to production:
 1. Generate a strong `DJANGO_SECRET_KEY`
 2. Set `DEBUG=False`
 3. Use a strong database password
-4. Set `CERT_RESOLVER=letsencrypt` and `TRAEFIK_DASHBOARD_HOST` to your real domain in `traefik/.env` — `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` derive from it automatically
-5. Implement rate limiting on the API
-6. Use managed PostgreSQL or regular backups
+4. Set `TRAEFIK_DASHBOARD_HOST` to your real domain — `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` derive from it automatically
+5. Set `CERT_RESOLVER=letsencrypt` (matches your Traefik `.env`)
+6. Implement rate limiting on the API
+7. Use managed PostgreSQL or set up regular backups
 
 See `../docs/production-hardening.md` for the full security checklist.
 
