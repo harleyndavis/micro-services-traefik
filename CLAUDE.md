@@ -119,6 +119,34 @@ QR codes are generated client-side using `qrcodejs` (loaded from CDN).
 
 **Tracking:** The redirect view at `/s/<code>` checks `?src=qr` and increments `qr_scans` instead of `clicks`. The `/api/links/stats/` endpoint exposes `total_qr_scans`.
 
+## Branching Conventions
+
+**Never commit directly to `main`.** All new work — features, fixes, experiments — must start from a fresh branch.
+
+Before writing any code or editing any file, check the current branch with `git branch --show-current`. If it is `main`, create and switch to a new branch first.
+
+**Naming convention:**
+| Work type | Prefix | Example |
+|---|---|---|
+| New feature | `feature/` | `feature/add-analytics-dashboard` |
+| Bug fix | `fix/` | `fix/redirect-loop-on-short-url` |
+| Chore / infra / deps | `chore/` | `chore/upgrade-traefik-v3` |
+| Documentation | `docs/` | `docs/production-hardening-notes` |
+
+Use lowercase kebab-case after the prefix. Branch names should be descriptive enough that the purpose is obvious without reading the commits.
+
+**One-time local setup (run after cloning):**
+```bash
+git config core.hooksPath .githooks
+```
+This activates the `pre-push` hook in `.githooks/`, which blocks direct pushes to `main` and prompts you to use a feature branch instead.
+
+**Workflow:**
+1. `git checkout -b <prefix>/<short-description>` before touching any file.
+2. Commit incrementally with clear messages as work progresses.
+3. Open a PR against `main` when the feature is complete and tested.
+4. Do not squash or rebase published branches without explicit instruction.
+
 ## Production Hardening
 
 See `docs/production-hardening.md` for the full checklist (IP allowlist for dashboard, ufw rules, Docker socket exposure, SSH hygiene, etc.).
