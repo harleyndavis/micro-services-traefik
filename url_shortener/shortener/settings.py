@@ -81,6 +81,11 @@ USE_TZ = True
 
 ASSETS_URL = os.getenv("ASSETS_URL", "")
 
+# Derived from TRAEFIK_DASHBOARD_HOST — the www root of the main site, used in
+# nav templates so "Home" links out of the shortener subdomain to www.
+_host = os.getenv("TRAEFIK_DASHBOARD_HOST", "localhost")
+HOME_URL = f"https://www.{_host}"
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
