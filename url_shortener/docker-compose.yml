@@ -44,7 +44,7 @@ services:
       - ./:/app
     command: >
       sh -c "python manage.py migrate &&
-             RUN mkdir -p static &&
+             mkdir -p static &&
              python manage.py collectstatic --noinput &&
              gunicorn --bind 0.0.0.0:8000 --workers 4 --timeout 120 shortener.wsgi:application"
 
