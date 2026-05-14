@@ -104,7 +104,7 @@ docker compose --env-file .env.example up -d --build
 
 **Key behaviours:**
 - `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` are all derived from `DOMAIN` — no manual list needed.
-- `HOME_URL` is also derived from `DOMAIN` as `https://www.{host}` and injected into every template via the context processor. Nav "Home" links and the brand link point here so they exit the shortener subdomain to the main site. No separate env var required.
+- `HOME_URL` is also derived from `DOMAIN` as `https://www.{DOMAIN}` and injected into every template via the context processor. Nav "Home" links and the brand link point here so they exit the shortener subdomain to the main site. No separate env var required.
 - `staticfiles` is a named Docker volume shared between the build step and the running container to avoid bind-mount permission errors.
 - The `db` healthcheck uses `pg_isready -U <user> -d <dbname>` so the app waits for the correct database, not just the server process.
 - `CERT_RESOLVER` is set on the router label (`tls.certresolver=${CERT_RESOLVER:-}`); an empty value disables ACME and falls back to the Traefik file-provider cert.
