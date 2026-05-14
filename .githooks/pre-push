@@ -1,0 +1,20 @@
+#!/bin/bash
+# Blocks direct pushes to main. All changes must go through a pull request.
+
+remote="$1"
+
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$remote_ref" = "refs/heads/main" ]; then
+        echo ""
+        echo "ERROR: Direct pushes to main are not allowed."
+        echo "Create a feature branch and open a pull request instead:"
+        echo ""
+        echo "  git checkout -b feature/<name>"
+        echo "  git push origin feature/<name>"
+        echo ""
+        echo "To bypass this check (use with caution): git push --no-verify"
+        exit 1
+    fi
+done
+
+exit 0
