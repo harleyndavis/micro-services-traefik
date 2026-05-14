@@ -26,17 +26,14 @@ The defaults work for local development. Edit only the app-specific values:
 ```env
 DEBUG=True
 DJANGO_SECRET_KEY=your-secret-key-here
-ALLOWED_HOSTS=localhost,127.0.0.1,short.dev.localhost
 DB_HOST=db
 DB_PORT=5432
 DB_NAME=shortener
 DB_USER=postgres
 DB_PASSWORD=postgres
-CORS_ALLOWED_ORIGINS=https://short.dev.localhost,http://localhost:3000
-CSRF_TRUSTED_ORIGINS=https://short.dev.localhost,http://localhost
 ```
 
-For production, update `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` to use your real domain. `TRAEFIK_DASHBOARD_HOST` and `CERT_RESOLVER` are already set in `traefik/.env` and will be picked up automatically.
+`ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` are derived automatically from `TRAEFIK_DASHBOARD_HOST` in `docker-compose.yml` — no need to set them manually. For production, only `traefik/.env` needs updating.
 
 ## Step 2: Create the Traefik Network (if not already created)
 

@@ -26,14 +26,14 @@ services:
     environment:
       DEBUG: ${DEBUG:-False}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me-in-production}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      ALLOWED_HOSTS: "localhost,127.0.0.1,short.${TRAEFIK_DASHBOARD_HOST:-dev.localhost}"
       DB_HOST: ${DB_HOST:-db}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-shortener}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1}
+      CORS_ALLOWED_ORIGINS: "https://short.${TRAEFIK_DASHBOARD_HOST:-dev.localhost},http://localhost:3000,http://127.0.0.1:3000"
+      CSRF_TRUSTED_ORIGINS: "https://short.${TRAEFIK_DASHBOARD_HOST:-dev.localhost},http://localhost,http://127.0.0.1"
     depends_on:
       db:
         condition: service_healthy

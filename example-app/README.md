@@ -179,11 +179,10 @@ When deploying to production:
 
 1. Generate a strong `DJANGO_SECRET_KEY`
 2. Set `DEBUG=False`
-3. Update `ALLOWED_HOSTS` with your domain
-4. Use a strong database password
-5. Set `CERT_RESOLVER=letsencrypt` and provide `ACME_EMAIL`
-6. Implement rate limiting on the API
-7. Use managed PostgreSQL or regular backups
+3. Use a strong database password
+4. Set `CERT_RESOLVER=letsencrypt` and `TRAEFIK_DASHBOARD_HOST` to your real domain in `traefik/.env` — `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` derive from it automatically
+5. Implement rate limiting on the API
+6. Use managed PostgreSQL or regular backups
 
 See `../docs/production-hardening.md` for the full security checklist.
 
