@@ -1,446 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR Generator · hrly.sh</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Generator · hrly.sh</title>
 
-<!-- Apply stored theme BEFORE first paint to avoid a flash. -->
-<script>
-  (function () {
-    var v = localStorage.getItem('site-theme');
-    if (v === 'light' || v === 'dark') {
-      document.documentElement.setAttribute('data-theme', v);
-    }
-  })();
-</script>
+    <!-- Apply stored theme BEFORE first paint to avoid a flash. -->
+    <script>
+        (function () {
+            var v = localStorage.getItem('site-theme');
+            if (v === 'light' || v === 'dark') {
+                document.documentElement.setAttribute('data-theme', v);
+            }
+        })();
+    </script>
 
-<link rel="stylesheet" href="{{ ASSETS_URL }}/css/site.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="{{ ASSETS_URL }}/css/site.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
+
 <body class="with-grid">
 
-<!-- ═══════════════ Shared header ═══════════════ -->
-<header class="site-header">
-    <a class="brand" href="/">
-        <span class="dot"></span>
-        <b>hrly</b><span class="tld">.sh</span>
-    </a>
+    <!-- ═══════════════ Shared header ═══════════════ -->
+    <header class="site-header">
+        <a class="brand" href="/">
+            <span class="dot"></span>
+            <b>hrly</b><span class="tld">.sh</span>
+        </a>
 
-    <nav class="nav">
-        <a href="/">Home</a>
-        <a href="/s/">Shortener</a>
-        <a href="/qr/" class="is-active">QR Gen</a>
-    </nav>
+        <nav class="nav">
+            <a href="/">Home</a>
+            <a href="/">Shortener</a>
+            <a href="/qr/" class="is-active">QR Gen</a>
+        </nav>
 
-    <div class="header-right">
-        <div class="theme-toggle" role="group" aria-label="Theme">
-            <button type="button" data-theme="light" title="Light" aria-label="Light theme">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.2"/>
-                    <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
-                        <line x1="8" y1="1.5" x2="8" y2="3"/>
-                        <line x1="8" y1="13" x2="8" y2="14.5"/>
-                        <line x1="1.5" y1="8" x2="3" y2="8"/>
-                        <line x1="13" y1="8" x2="14.5" y2="8"/>
-                        <line x1="3.4" y1="3.4" x2="4.5" y2="4.5"/>
-                        <line x1="11.5" y1="11.5" x2="12.6" y2="12.6"/>
-                        <line x1="3.4" y1="12.6" x2="4.5" y2="11.5"/>
-                        <line x1="11.5" y1="4.5" x2="12.6" y2="3.4"/>
-                    </g>
-                </svg>
-            </button>
-            <button type="button" data-theme="system" title="System" aria-label="System theme">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/>
-                    <path d="M8 2 a6 6 0 0 1 0 12 z" fill="currentColor"/>
-                </svg>
-            </button>
-            <button type="button" data-theme="dark" title="Dark" aria-label="Dark theme">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z"
-                          stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
-                </svg>
-            </button>
+        <div class="header-right">
+            <div class="theme-toggle" role="group" aria-label="Theme">
+                <button type="button" data-theme="light" title="Light" aria-label="Light theme">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.2" />
+                        <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                            <line x1="8" y1="1.5" x2="8" y2="3" />
+                            <line x1="8" y1="13" x2="8" y2="14.5" />
+                            <line x1="1.5" y1="8" x2="3" y2="8" />
+                            <line x1="13" y1="8" x2="14.5" y2="8" />
+                            <line x1="3.4" y1="3.4" x2="4.5" y2="4.5" />
+                            <line x1="11.5" y1="11.5" x2="12.6" y2="12.6" />
+                            <line x1="3.4" y1="12.6" x2="4.5" y2="11.5" />
+                            <line x1="11.5" y1="4.5" x2="12.6" y2="3.4" />
+                        </g>
+                    </svg>
+                </button>
+                <button type="button" data-theme="system" title="System" aria-label="System theme">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" />
+                        <path d="M8 2 a6 6 0 0 1 0 12 z" fill="currentColor" />
+                    </svg>
+                </button>
+                <button type="button" data-theme="dark" title="Dark" aria-label="Dark theme">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" stroke="currentColor"
+                            stroke-width="1.2" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<!-- ═══════════════ Main ═══════════════ -->
-<main class="main">
-    <div class="content narrow">
+    <!-- ═══════════════ Main ═══════════════ -->
+    <main class="main">
+        <div class="content narrow">
 
-        <!-- ── Hero ─────────────────────────────── -->
-        <header>
-            <p class="eyebrow">// utility</p>
-            <h1 class="h1 small">QR<span class="accent">_</span>GEN</h1>
-            <p class="tagline">Encode anything as a scannable QR.</p>
-        </header>
+            <!-- ── Hero ─────────────────────────────── -->
+            <header>
+                <p class="eyebrow">// utility</p>
+                <h1 class="h1 small">QR<span class="accent">_</span>GEN</h1>
+                <p class="tagline">Encode anything as a scannable QR.</p>
+            </header>
 
-        <!-- ── Mode tabs ───────────────────────── -->
-        <div class="tabs" role="tablist">
-            <button type="button" class="is-active" data-mode="text">Text / URL</button>
-            <button type="button" data-mode="contact">Contact</button>
-            <button type="button" data-mode="wifi">Wi-Fi</button>
-            <button type="button" data-mode="email">Email</button>
-            <button type="button" data-mode="sms">SMS</button>
-        </div>
-
-        <!-- ── Form card ───────────────────────── -->
-        <div class="card card-stack">
-
-            <!-- TEXT panel -->
-            <div class="panel is-active" id="panel-text">
-                <div>
-                    <label class="field-label" for="inputText">Input — URL, text, or any data</label>
-                    <textarea id="inputText" class="input" placeholder="https://example.com" rows="3"></textarea>
-                </div>
+            <!-- ── Mode tabs ───────────────────────── -->
+            <div class="tabs" role="tablist">
+                <button type="button" class="is-active" data-mode="text">Text / URL</button>
+                <button type="button" data-mode="contact">Contact</button>
+                <button type="button" data-mode="wifi">Wi-Fi</button>
+                <button type="button" data-mode="email">Email</button>
+                <button type="button" data-mode="sms">SMS</button>
             </div>
 
-            <!-- CONTACT panel (vCard) -->
-            <div class="panel" id="panel-contact">
+            <!-- ── Form card ───────────────────────── -->
+            <div class="card card-stack">
+
+                <!-- TEXT panel -->
+                <div class="panel is-active" id="panel-text">
+                    <div>
+                        <label class="field-label" for="inputText">Input — URL, text, or any data</label>
+                        <textarea id="inputText" class="input" placeholder="https://example.com" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- CONTACT panel (vCard) -->
+                <div class="panel" id="panel-contact">
+                    <div class="row">
+                        <div>
+                            <label class="field-label" for="c-first">First Name *</label>
+                            <input type="text" id="c-first" class="input" placeholder="Jane">
+                        </div>
+                        <div>
+                            <label class="field-label" for="c-last">Last Name</label>
+                            <input type="text" id="c-last" class="input" placeholder="Smith">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label" for="c-org">Organization</label>
+                        <input type="text" id="c-org" class="input" placeholder="Acme Corp">
+                    </div>
+                    <div>
+                        <label class="field-label" for="c-title">Job Title</label>
+                        <input type="text" id="c-title" class="input" placeholder="Product Manager">
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label class="field-label" for="c-phone">Phone</label>
+                            <input type="tel" id="c-phone" class="input" placeholder="+1 555 000 0000">
+                        </div>
+                        <div>
+                            <label class="field-label" for="c-mobile">Mobile</label>
+                            <input type="tel" id="c-mobile" class="input" placeholder="+1 555 000 0001">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label" for="c-email">Email</label>
+                        <input type="email" id="c-email" class="input" placeholder="jane@example.com">
+                    </div>
+                    <div>
+                        <label class="field-label" for="c-website">Website</label>
+                        <input type="url" id="c-website" class="input" placeholder="https://example.com">
+                    </div>
+                    <div>
+                        <label class="field-label" for="c-address">Address</label>
+                        <input type="text" id="c-address" class="input" placeholder="123 Main St, Spokane, WA 99201">
+                    </div>
+                </div>
+
+                <!-- WIFI panel -->
+                <div class="panel" id="panel-wifi">
+                    <div>
+                        <label class="field-label" for="w-ssid">Network Name (SSID) *</label>
+                        <input type="text" id="w-ssid" class="input" placeholder="MyNetwork">
+                    </div>
+                    <div>
+                        <label class="field-label" for="w-pass">Password</label>
+                        <input type="text" id="w-pass" class="input" placeholder="password123">
+                    </div>
+                    <div>
+                        <label class="field-label" for="w-security">Security Type</label>
+                        <select id="w-security" class="input">
+                            <option value="WPA">WPA / WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">None (open network)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- EMAIL panel -->
+                <div class="panel" id="panel-email">
+                    <div>
+                        <label class="field-label" for="e-to">To *</label>
+                        <input type="email" id="e-to" class="input" placeholder="recipient@example.com">
+                    </div>
+                    <div>
+                        <label class="field-label" for="e-subject">Subject</label>
+                        <input type="text" id="e-subject" class="input" placeholder="Hello!">
+                    </div>
+                    <div>
+                        <label class="field-label" for="e-body">Body</label>
+                        <textarea id="e-body" class="input" rows="3" placeholder="Message body..."></textarea>
+                    </div>
+                </div>
+
+                <!-- SMS panel -->
+                <div class="panel" id="panel-sms">
+                    <div>
+                        <label class="field-label" for="s-phone">Phone Number *</label>
+                        <input type="tel" id="s-phone" class="input" placeholder="+1 555 000 0000">
+                    </div>
+                    <div>
+                        <label class="field-label" for="s-msg">Message</label>
+                        <textarea id="s-msg" class="input" rows="3" placeholder="Your message..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Shared settings -->
+                <h2 class="section-head" style="margin-top:4px; margin-bottom:4px;">Settings</h2>
+
                 <div class="row">
                     <div>
-                        <label class="field-label" for="c-first">First Name *</label>
-                        <input type="text" id="c-first" class="input" placeholder="Jane">
+                        <label class="field-label" for="sizeSlider">Size</label>
+                        <div class="slider-wrap">
+                            <input type="range" class="slider" id="sizeSlider" min="128" max="512" step="32"
+                                value="256">
+                            <span class="slider-val" id="sizeVal">256px</span>
+                        </div>
                     </div>
                     <div>
-                        <label class="field-label" for="c-last">Last Name</label>
-                        <input type="text" id="c-last" class="input" placeholder="Smith">
+                        <label class="field-label" for="colorMode">Color</label>
+                        <select id="colorMode" class="input">
+                            <option value="bw">Black / White</option>
+                            <option value="dark">Dark / Accent</option>
+                            <option value="inv">White / Black</option>
+                        </select>
                     </div>
                 </div>
+
                 <div>
-                    <label class="field-label" for="c-org">Organization</label>
-                    <input type="text" id="c-org" class="input" placeholder="Acme Corp">
-                </div>
-                <div>
-                    <label class="field-label" for="c-title">Job Title</label>
-                    <input type="text" id="c-title" class="input" placeholder="Product Manager">
-                </div>
-                <div class="row">
-                    <div>
-                        <label class="field-label" for="c-phone">Phone</label>
-                        <input type="tel" id="c-phone" class="input" placeholder="+1 555 000 0000">
-                    </div>
-                    <div>
-                        <label class="field-label" for="c-mobile">Mobile</label>
-                        <input type="tel" id="c-mobile" class="input" placeholder="+1 555 000 0001">
+                    <label class="field-label">Error Correction</label>
+                    <div class="ec-pills">
+                        <button type="button" class="ec-pill is-active" data-ec="L">L<small>7%</small></button>
+                        <button type="button" class="ec-pill" data-ec="M">M<small>15%</small></button>
+                        <button type="button" class="ec-pill" data-ec="Q">Q<small>25%</small></button>
+                        <button type="button" class="ec-pill" data-ec="H">H<small>30%</small></button>
                     </div>
                 </div>
-                <div>
-                    <label class="field-label" for="c-email">Email</label>
-                    <input type="email" id="c-email" class="input" placeholder="jane@example.com">
-                </div>
-                <div>
-                    <label class="field-label" for="c-website">Website</label>
-                    <input type="url" id="c-website" class="input" placeholder="https://example.com">
-                </div>
-                <div>
-                    <label class="field-label" for="c-address">Address</label>
-                    <input type="text" id="c-address" class="input" placeholder="123 Main St, Spokane, WA 99201">
-                </div>
+
+                <button type="button" class="btn" onclick="generate()">Generate QR Code</button>
             </div>
 
-            <!-- WIFI panel -->
-            <div class="panel" id="panel-wifi">
-                <div>
-                    <label class="field-label" for="w-ssid">Network Name (SSID) *</label>
-                    <input type="text" id="w-ssid" class="input" placeholder="MyNetwork">
-                </div>
-                <div>
-                    <label class="field-label" for="w-pass">Password</label>
-                    <input type="text" id="w-pass" class="input" placeholder="password123">
-                </div>
-                <div>
-                    <label class="field-label" for="w-security">Security Type</label>
-                    <select id="w-security" class="input">
-                        <option value="WPA">WPA / WPA2</option>
-                        <option value="WEP">WEP</option>
-                        <option value="nopass">None (open network)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- EMAIL panel -->
-            <div class="panel" id="panel-email">
-                <div>
-                    <label class="field-label" for="e-to">To *</label>
-                    <input type="email" id="e-to" class="input" placeholder="recipient@example.com">
-                </div>
-                <div>
-                    <label class="field-label" for="e-subject">Subject</label>
-                    <input type="text" id="e-subject" class="input" placeholder="Hello!">
-                </div>
-                <div>
-                    <label class="field-label" for="e-body">Body</label>
-                    <textarea id="e-body" class="input" rows="3" placeholder="Message body..."></textarea>
-                </div>
-            </div>
-
-            <!-- SMS panel -->
-            <div class="panel" id="panel-sms">
-                <div>
-                    <label class="field-label" for="s-phone">Phone Number *</label>
-                    <input type="tel" id="s-phone" class="input" placeholder="+1 555 000 0000">
-                </div>
-                <div>
-                    <label class="field-label" for="s-msg">Message</label>
-                    <textarea id="s-msg" class="input" rows="3" placeholder="Your message..."></textarea>
-                </div>
-            </div>
-
-            <!-- Shared settings -->
-            <h2 class="section-head" style="margin-top:4px; margin-bottom:4px;">Settings</h2>
-
-            <div class="row">
-                <div>
-                    <label class="field-label" for="sizeSlider">Size</label>
-                    <div class="slider-wrap">
-                        <input type="range" class="slider" id="sizeSlider"
-                               min="128" max="512" step="32" value="256">
-                        <span class="slider-val" id="sizeVal">256px</span>
+            <!-- ── Output (hidden until generate clicked) ─────── -->
+            <div class="card result" id="output" hidden>
+                <div class="qr-row">
+                    <div class="qr-frame">
+                        <div id="qrcode"></div>
+                    </div>
+                    <div class="qr-row-meta">
+                        <span class="pill"><span class="dot"></span><span id="metaText">TYPE: TEXT · EC: L ·
+                                256×256</span></span>
+                        <div class="qr-row-actions">
+                            <button type="button" class="btn ghost" onclick="downloadQR()">⬇ Download PNG</button>
+                            <button type="button" class="btn ghost" onclick="copyQR()">⎘ Copy Image</button>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label class="field-label" for="colorMode">Color</label>
-                    <select id="colorMode" class="input">
-                        <option value="bw">Black / White</option>
-                        <option value="dark">Dark / Accent</option>
-                        <option value="inv">White / Black</option>
-                    </select>
-                </div>
             </div>
 
-            <div>
-                <label class="field-label">Error Correction</label>
-                <div class="ec-pills">
-                    <button type="button" class="ec-pill is-active" data-ec="L">L<small>7%</small></button>
-                    <button type="button" class="ec-pill" data-ec="M">M<small>15%</small></button>
-                    <button type="button" class="ec-pill" data-ec="Q">Q<small>25%</small></button>
-                    <button type="button" class="ec-pill" data-ec="H">H<small>30%</small></button>
-                </div>
-            </div>
-
-            <button type="button" class="btn" onclick="generate()">Generate QR Code</button>
         </div>
+    </main>
 
-        <!-- ── Output (hidden until generate clicked) ─────── -->
-        <div class="card result" id="output" hidden>
-            <div class="qr-row">
-                <div class="qr-frame">
-                    <div id="qrcode"></div>
-                </div>
-                <div class="qr-row-meta">
-                    <span class="pill"><span class="dot"></span><span id="metaText">TYPE: TEXT · EC: L · 256×256</span></span>
-                    <div class="qr-row-actions">
-                        <button type="button" class="btn ghost" onclick="downloadQR()">⬇ Download PNG</button>
-                        <button type="button" class="btn ghost" onclick="copyQR()">⎘ Copy Image</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- ═══════════════ Footer ═══════════════ -->
+    <footer class="site-footer">
+        <span>// hrly.sh — <span id="year">2026</span></span>
+        <span>BUILT WITH CAFFEINE &amp; CURIOSITY</span>
+    </footer>
 
-    </div>
-</main>
+    <!-- ═══════════════ Theme toggle ═══════════════ -->
+    <script>
+        (function () {
+            var KEY = 'site-theme';
+            function apply(v) {
+                if (v === 'light' || v === 'dark') document.documentElement.setAttribute('data-theme', v);
+                else document.documentElement.removeAttribute('data-theme');
+            }
+            function current() { return localStorage.getItem(KEY) || 'system'; }
+            function paint() {
+                var v = current();
+                document.querySelectorAll('.theme-toggle button').forEach(function (b) {
+                    b.classList.toggle('is-active', b.dataset.theme === v);
+                });
+            }
+            document.querySelectorAll('.theme-toggle button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var v = b.dataset.theme;
+                    if (v === 'system') localStorage.removeItem(KEY);
+                    else localStorage.setItem(KEY, v);
+                    apply(v); paint();
+                });
+            });
+            paint();
+            document.getElementById('year').textContent = new Date().getFullYear();
+        })();
+    </script>
 
-<!-- ═══════════════ Footer ═══════════════ -->
-<footer class="site-footer">
-    <span>// hrly.sh — <span id="year">2026</span></span>
-    <span>BUILT WITH CAFFEINE &amp; CURIOSITY</span>
-</footer>
+    <!-- ═══════════════ QR Generator behavior (preserved from your original) ═══════════════ -->
+    <script>
+        // Pre-fill from ?url= when linked from the shortener.
+        const _urlParam = new URLSearchParams(window.location.search).get('url');
+        if (_urlParam) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('inputText').value = _urlParam;
+                setTimeout(generate, 50);
+            });
+        }
 
-<!-- ═══════════════ Theme toggle ═══════════════ -->
-<script>
-  (function () {
-    var KEY = 'site-theme';
-    function apply(v) {
-      if (v === 'light' || v === 'dark') document.documentElement.setAttribute('data-theme', v);
-      else document.documentElement.removeAttribute('data-theme');
-    }
-    function current() { return localStorage.getItem(KEY) || 'system'; }
-    function paint() {
-      var v = current();
-      document.querySelectorAll('.theme-toggle button').forEach(function (b) {
-        b.classList.toggle('is-active', b.dataset.theme === v);
-      });
-    }
-    document.querySelectorAll('.theme-toggle button').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var v = b.dataset.theme;
-        if (v === 'system') localStorage.removeItem(KEY);
-        else localStorage.setItem(KEY, v);
-        apply(v); paint();
-      });
-    });
-    paint();
-    document.getElementById('year').textContent = new Date().getFullYear();
-  })();
-</script>
+        let currentMode = 'text';
 
-<!-- ═══════════════ QR Generator behavior (preserved from your original) ═══════════════ -->
-<script>
-    // Pre-fill from ?url= when linked from the shortener.
-    const _urlParam = new URLSearchParams(window.location.search).get('url');
-    if (_urlParam) {
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('inputText').value = _urlParam;
-            setTimeout(generate, 50);
+        document.querySelectorAll('.tabs button').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tabs button').forEach(t => t.classList.remove('is-active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('is-active'));
+                tab.classList.add('is-active');
+                currentMode = tab.dataset.mode;
+                document.getElementById('panel-' + currentMode).classList.add('is-active');
+                document.getElementById('output').hidden = true;
+            });
         });
-    }
 
-    let currentMode = 'text';
+        const slider = document.getElementById('sizeSlider');
+        const sizeVal = document.getElementById('sizeVal');
+        slider.addEventListener('input', () => sizeVal.textContent = slider.value + 'px');
 
-    document.querySelectorAll('.tabs button').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.tabs button').forEach(t => t.classList.remove('is-active'));
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('is-active'));
-            tab.classList.add('is-active');
-            currentMode = tab.dataset.mode;
-            document.getElementById('panel-' + currentMode).classList.add('is-active');
-            document.getElementById('output').hidden = true;
+        let selectedEC = 'L';
+        document.querySelectorAll('.ec-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ec-pill').forEach(b => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+                selectedEC = btn.dataset.ec;
+            });
         });
-    });
 
-    const slider = document.getElementById('sizeSlider');
-    const sizeVal = document.getElementById('sizeVal');
-    slider.addEventListener('input', () => sizeVal.textContent = slider.value + 'px');
+        // Pull the accent value from a CSS var so the "Dark / Accent" preset
+        // matches whatever color the site is themed with.
+        function cssVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+        function colorMap() {
+            return {
+                bw: { dark: '#000000', light: '#ffffff' },
+                dark: { dark: '#0a0a0a', light: cssVar('--accent') || '#16a34a' },
+                inv: { dark: '#ffffff', light: '#000000' },
+            };
+        }
 
-    let selectedEC = 'L';
-    document.querySelectorAll('.ec-pill').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.ec-pill').forEach(b => b.classList.remove('is-active'));
-            btn.classList.add('is-active');
-            selectedEC = btn.dataset.ec;
-        });
-    });
-
-    // Pull the accent value from a CSS var so the "Dark / Accent" preset
-    // matches whatever color the site is themed with.
-    function cssVar(name) {
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    }
-    function colorMap() {
-        return {
-            bw:   { dark: '#000000', light: '#ffffff' },
-            dark: { dark: '#0a0a0a', light: cssVar('--accent') || '#16a34a' },
-            inv:  { dark: '#ffffff', light: '#000000' },
+        const ecMap = {
+            L: QRCode.CorrectLevel.L,
+            M: QRCode.CorrectLevel.M,
+            Q: QRCode.CorrectLevel.Q,
+            H: QRCode.CorrectLevel.H,
         };
-    }
 
-    const ecMap = {
-        L: QRCode.CorrectLevel.L,
-        M: QRCode.CorrectLevel.M,
-        Q: QRCode.CorrectLevel.Q,
-        H: QRCode.CorrectLevel.H,
-    };
+        function v(id) { return document.getElementById(id).value.trim(); }
 
-    function v(id) { return document.getElementById(id).value.trim(); }
+        function buildPayload() {
+            switch (currentMode) {
+                case 'text':
+                    return v('inputText') || null;
 
-    function buildPayload() {
-        switch (currentMode) {
-            case 'text':
-                return v('inputText') || null;
+                case 'contact': {
+                    const first = v('c-first'), last = v('c-last');
+                    if (!first && !last) return null;
+                    let vc = 'BEGIN:VCARD\nVERSION:3.0\n';
+                    vc += `N:${last};${first};;;\n`;
+                    vc += `FN:${[first, last].filter(Boolean).join(' ')}\n`;
+                    if (v('c-org')) vc += `ORG:${v('c-org')}\n`;
+                    if (v('c-title')) vc += `TITLE:${v('c-title')}\n`;
+                    if (v('c-phone')) vc += `TEL;TYPE=WORK,VOICE:${v('c-phone')}\n`;
+                    if (v('c-mobile')) vc += `TEL;TYPE=CELL:${v('c-mobile')}\n`;
+                    if (v('c-email')) vc += `EMAIL:${v('c-email')}\n`;
+                    if (v('c-website')) vc += `URL:${v('c-website')}\n`;
+                    if (v('c-address')) vc += `ADR;TYPE=WORK:;;${v('c-address')};;;;\n`;
+                    vc += 'END:VCARD';
+                    return vc;
+                }
 
-            case 'contact': {
-                const first = v('c-first'), last = v('c-last');
-                if (!first && !last) return null;
-                let vc = 'BEGIN:VCARD\nVERSION:3.0\n';
-                vc += `N:${last};${first};;;\n`;
-                vc += `FN:${[first, last].filter(Boolean).join(' ')}\n`;
-                if (v('c-org'))     vc += `ORG:${v('c-org')}\n`;
-                if (v('c-title'))   vc += `TITLE:${v('c-title')}\n`;
-                if (v('c-phone'))   vc += `TEL;TYPE=WORK,VOICE:${v('c-phone')}\n`;
-                if (v('c-mobile'))  vc += `TEL;TYPE=CELL:${v('c-mobile')}\n`;
-                if (v('c-email'))   vc += `EMAIL:${v('c-email')}\n`;
-                if (v('c-website')) vc += `URL:${v('c-website')}\n`;
-                if (v('c-address')) vc += `ADR;TYPE=WORK:;;${v('c-address')};;;;\n`;
-                vc += 'END:VCARD';
-                return vc;
+                case 'wifi': {
+                    const ssid = v('w-ssid');
+                    if (!ssid) return null;
+                    return `WIFI:T:${v('w-security')};S:${ssid};P:${v('w-pass')};;`;
+                }
+
+                case 'email': {
+                    const to = v('e-to');
+                    if (!to) return null;
+                    const sub = encodeURIComponent(v('e-subject'));
+                    const body = encodeURIComponent(v('e-body'));
+                    return `mailto:${to}?subject=${sub}&body=${body}`;
+                }
+
+                case 'sms': {
+                    const phone = v('s-phone');
+                    if (!phone) return null;
+                    return `sms:${phone}?body=${encodeURIComponent(v('s-msg'))}`;
+                }
             }
-
-            case 'wifi': {
-                const ssid = v('w-ssid');
-                if (!ssid) return null;
-                return `WIFI:T:${v('w-security')};S:${ssid};P:${v('w-pass')};;`;
-            }
-
-            case 'email': {
-                const to = v('e-to');
-                if (!to) return null;
-                const sub = encodeURIComponent(v('e-subject'));
-                const body = encodeURIComponent(v('e-body'));
-                return `mailto:${to}?subject=${sub}&body=${body}`;
-            }
-
-            case 'sms': {
-                const phone = v('s-phone');
-                if (!phone) return null;
-                return `sms:${phone}?body=${encodeURIComponent(v('s-msg'))}`;
-            }
-        }
-        return null;
-    }
-
-    function generate() {
-        const payload = buildPayload();
-        if (!payload) {
-            alert('Please fill in the required fields (marked *).');
-            return;
+            return null;
         }
 
-        const size = parseInt(slider.value);
-        const colors = colorMap()[document.getElementById('colorMode').value];
-        const container = document.getElementById('qrcode');
-        container.innerHTML = '';
-
-        new QRCode(container, {
-            text: payload,
-            width: size,
-            height: size,
-            colorDark: colors.dark,
-            colorLight: colors.light,
-            correctLevel: ecMap[selectedEC],
-        });
-
-        const labels = { text:'TEXT', contact:'vCARD 3.0', wifi:'WI-FI', email:'EMAIL', sms:'SMS' };
-        document.getElementById('metaText').textContent =
-            `TYPE: ${labels[currentMode]} · EC: ${selectedEC} · ${size}×${size}`;
-
-        const out = document.getElementById('output');
-        out.hidden = false;
-        // Re-run the fadeUp animation each time:
-        out.style.animation = 'none';
-        void out.offsetWidth;
-        out.style.animation = '';
-    }
-
-    function getCanvas() { return document.querySelector('#qrcode canvas'); }
-
-    function downloadQR() {
-        const canvas = getCanvas();
-        if (!canvas) return;
-        const a = document.createElement('a');
-        a.download = 'qrcode.png';
-        a.href = canvas.toDataURL('image/png');
-        a.click();
-    }
-
-    async function copyQR() {
-        const canvas = getCanvas();
-        if (!canvas) return;
-        canvas.toBlob(async blob => {
-            try {
-                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-                const btn = event.currentTarget;
-                const orig = btn.textContent;
-                btn.textContent = '✓ Copied!';
-                setTimeout(() => btn.textContent = orig, 1500);
-            } catch (e) {
-                alert('Copy not supported in this browser — use Download instead.');
+        function generate() {
+            const payload = buildPayload();
+            if (!payload) {
+                alert('Please fill in the required fields (marked *).');
+                return;
             }
-        });
-    }
-</script>
+
+            const size = parseInt(slider.value);
+            const colors = colorMap()[document.getElementById('colorMode').value];
+            const container = document.getElementById('qrcode');
+            container.innerHTML = '';
+
+            new QRCode(container, {
+                text: payload,
+                width: size,
+                height: size,
+                colorDark: colors.dark,
+                colorLight: colors.light,
+                correctLevel: ecMap[selectedEC],
+            });
+
+            const labels = { text: 'TEXT', contact: 'vCARD 3.0', wifi: 'WI-FI', email: 'EMAIL', sms: 'SMS' };
+            document.getElementById('metaText').textContent =
+                `TYPE: ${labels[currentMode]} · EC: ${selectedEC} · ${size}×${size}`;
+
+            const out = document.getElementById('output');
+            out.hidden = false;
+            // Re-run the fadeUp animation each time:
+            out.style.animation = 'none';
+            void out.offsetWidth;
+            out.style.animation = '';
+        }
+
+        function getCanvas() { return document.querySelector('#qrcode canvas'); }
+
+        function downloadQR() {
+            const canvas = getCanvas();
+            if (!canvas) return;
+            const a = document.createElement('a');
+            a.download = 'qrcode.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+
+        async function copyQR() {
+            const canvas = getCanvas();
+            if (!canvas) return;
+            canvas.toBlob(async blob => {
+                try {
+                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                    const btn = event.currentTarget;
+                    const orig = btn.textContent;
+                    btn.textContent = '✓ Copied!';
+                    setTimeout(() => btn.textContent = orig, 1500);
+                } catch (e) {
+                    alert('Copy not supported in this browser — use Download instead.');
+                }
+            });
+        }
+    </script>
 
 </body>
+
 </html>
