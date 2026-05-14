@@ -17,5 +17,5 @@ urlpatterns = [
         name="redirect",
     ),
     path("qr/", TemplateView.as_view(template_name="qr_generator.html"), name="qr_generator"),
-    path("", TemplateView.as_view(template_name="index.html"), name="home"),
+    path("", TemplateView.as_view(template_name="shortener.html"), name="home"),
 ]
