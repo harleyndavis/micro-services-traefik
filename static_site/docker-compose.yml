@@ -2,8 +2,11 @@ services:
   static_site:
     image: nginx:alpine
     restart: unless-stopped
+    env_file:
+      - ../.env
     volumes:
       - ./html:/usr/share/nginx/html:ro
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.static_site.rule=Host(`www.${DOMAIN}`)"

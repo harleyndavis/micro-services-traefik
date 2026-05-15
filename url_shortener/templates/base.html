@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+
+    <!-- Apply stored theme BEFORE first paint to avoid a flash. -->
+    <script>
+      (function () {
+        var v = localStorage.getItem('site-theme');
+        if (v === 'light' || v === 'dark') {
+          document.documentElement.setAttribute('data-theme', v);
+        }
+      })();
+    </script>
+
+    <link rel="stylesheet" href="{{ ASSETS_URL }}/css/site.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="with-grid">
+
+    {% include "partials/header.html" %}
+
+    {% block content %}{% endblock %}
+
+    {% include "partials/footer.html" %}
+    {% include "partials/theme-script.html" %}
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

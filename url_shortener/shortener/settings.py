@@ -80,10 +80,14 @@ USE_I18N = True
 USE_TZ = True
 
 _host = os.getenv("DOMAIN", "localhost")
-# www root of the main site — used in nav links and shared asset URLs so
-# templates can reach outside the shortener subdomain.
-HOME_URL = f"https://www.{_host}"
-ASSETS_URL = HOME_URL
+# Absolute URLs for cross-subdomain navigation, shared with the nginx static site
+# via context processor so templates never hardcode the domain.
+HOME_URL      = f"https://www.{_host}"
+SHORTENER_URL = f"https://short.{_host}/"
+QR_URL        = f"https://short.{_host}/qr/"
+ASSETS_URL    = HOME_URL
+SITE_NAME     = os.getenv("SITE_NAME", _host)
+SITE_TAGLINE  = os.getenv("SITE_TAGLINE", "")
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"

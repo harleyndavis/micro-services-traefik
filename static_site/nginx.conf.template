@@ -1,0 +1,34 @@
+server {
+    listen      80;
+    server_name _;
+
+    root  /usr/share/nginx/html;
+    index index.html;
+
+    ssi            on;
+    ssi_last_modified on;
+
+    # Partials are SSI-internal only — block direct browser requests.
+    location /_partials/ {
+        internal;
+    }
+
+    # Replace {{ }} placeholders in SSI-assembled output.
+    # ${VAR} tokens are substituted by envsubst at container startup from env vars.
+    sub_filter '{{ HOME_URL }}'       'https://www.${DOMAIN}';
+    sub_filter '{{ SHORTENER_URL }}'  'https://short.${DOMAIN}/';
+    sub_filter '{{ QR_URL }}'         'https://short.${DOMAIN}/qr/';
+    sub_filter '{{ SITE_NAME }}'      '${SITE_NAME}';
+    sub_filter '{{ AUTHOR_NAME }}'    '${AUTHOR_NAME}';
+    sub_filter '{{ AUTHOR_EMAIL }}'   '${AUTHOR_EMAIL}';
+    sub_filter '{{ GITHUB_URL }}'     '${GITHUB_URL}';
+    sub_filter '{{ GITHUB_HANDLE }}'  '${GITHUB_HANDLE}';
+    sub_filter '{{ LINKEDIN_URL }}'   '${LINKEDIN_URL}';
+    sub_filter '{{ LINKEDIN_HANDLE }}' '${LINKEDIN_HANDLE}';
+    sub_filter '{{ SITE_TAGLINE }}'   '${SITE_TAGLINE}';
+    sub_filter_once off;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}

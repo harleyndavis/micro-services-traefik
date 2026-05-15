@@ -1,0 +1,44 @@
+<header class="site-header">
+    <a class="brand" href="{{ HOME_URL }}">
+        <span class="dot"></span>
+        {{ SITE_NAME }}
+    </a>
+
+    <nav class="nav">
+        <a href="{{ HOME_URL }}">Home</a>
+        <a href="{{ SHORTENER_URL }}">Shortener</a>
+        <a href="{{ QR_URL }}">QR Gen</a>
+    </nav>
+
+    <div class="header-right">
+        <div class="theme-toggle" role="group" aria-label="Theme">
+            <button type="button" data-theme="light" title="Light" aria-label="Light theme">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.2"/>
+                    <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                        <line x1="8" y1="1.5" x2="8" y2="3"/>
+                        <line x1="8" y1="13" x2="8" y2="14.5"/>
+                        <line x1="1.5" y1="8" x2="3" y2="8"/>
+                        <line x1="13" y1="8" x2="14.5" y2="8"/>
+                        <line x1="3.4" y1="3.4" x2="4.5" y2="4.5"/>
+                        <line x1="11.5" y1="11.5" x2="12.6" y2="12.6"/>
+                        <line x1="3.4" y1="12.6" x2="4.5" y2="11.5"/>
+                        <line x1="11.5" y1="4.5" x2="12.6" y2="3.4"/>
+                    </g>
+                </svg>
+            </button>
+            <button type="button" data-theme="system" title="System" aria-label="System theme">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M8 2 a6 6 0 0 1 0 12 z" fill="currentColor"/>
+                </svg>
+            </button>
+            <button type="button" data-theme="dark" title="Dark" aria-label="Dark theme">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z"
+                          stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
