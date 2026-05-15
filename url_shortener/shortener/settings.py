@@ -43,7 +43,7 @@ ROOT_URLCONF = "shortener.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -51,7 +51,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "shortener.context_processors.assets_url",
             ],
         },
     },
@@ -84,18 +83,8 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Absolute URLs for cross-subdomain navigation, shared with the nginx static site
-# via context processor so templates never hardcode the domain.
-HOME_URL      = f"https://www.{_host}"
-SHORTENER_URL = f"https://short.{_host}/"
-QR_URL        = f"https://short.{_host}/qr/"
-ASSETS_URL    = HOME_URL
-SITE_NAME     = os.getenv("SITE_NAME", _host)
-SITE_TAGLINE  = os.getenv("SITE_TAGLINE", "")
-
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -118,4 +107,6 @@ CSRF_TRUSTED_ORIGINS = _csrf.split(",") if _csrf else [
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
 }

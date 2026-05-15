@@ -18,8 +18,6 @@ services:
     env_file:
       - ../.env
       - .env
-    environment:
-      - SITE_NAME=${SITE_NAME:-${DOMAIN}}
     depends_on:
       db:
         condition: service_healthy
@@ -27,15 +25,17 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.shortener.rule=Host(`short.${DOMAIN}`)"
-      - "traefik.http.routers.shortener.entrypoints=websecure"
-      - "traefik.http.routers.shortener.tls=true"
-      - "traefik.http.routers.shortener.tls.certresolver=${CERT_RESOLVER}"
+      # High-priority router: catches API, admin, redirects, and static assets.
+      # The shortener-ui router in static_site/docker-compose.yml catches everything else.
+      - "traefik.http.routers.shortener-api.rule=Host(`short.${DOMAIN}`) && (PathPrefix(`/api/`) || PathPrefix(`/admin/`) || PathPrefix(`/s/`) || PathPrefix(`/static/`))"
+      - "traefik.http.routers.shortener-api.entrypoints=websecure"
+      - "traefik.http.routers.shortener-api.tls=true"
+      - "traefik.http.routers.shortener-api.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.shortener-api.priority=10"
       - "traefik.http.services.shortener.loadbalancer.server.port=8000"
     volumes:
       - ./:/app
       - staticfiles:/app/staticfiles
-      - ../static_site/html/_partials:/app/templates/partials:ro
     command: >
       sh -c "python manage.py migrate &&
              python manage.py collectstatic --noinput &&
