@@ -1,73 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Generator · hrly.sh</title>
+{% block title %}QR Generator · {{ SITE_NAME }}{% endblock %}
 
-    <!-- Apply stored theme BEFORE first paint to avoid a flash. -->
-    <script>
-        (function () {
-            var v = localStorage.getItem('site-theme');
-            if (v === 'light' || v === 'dark') {
-                document.documentElement.setAttribute('data-theme', v);
-            }
-        })();
-    </script>
-
-    <link rel="stylesheet" href="{{ ASSETS_URL }}/css/site.css">
+{% block extra_head %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</head>
+{% endblock %}
 
-<body class="with-grid">
-
-    <!-- ═══════════════ Shared header ═══════════════ -->
-    <header class="site-header">
-        <a class="brand" href="{{ HOME_URL }}">
-            <span class="dot"></span>
-            <b>hrly</b><span class="tld">.sh</span>
-        </a>
-
-        <nav class="nav">
-            <a href="{{ HOME_URL }}">Home</a>
-            <a href="/">Shortener</a>
-            <a href="/qr/" class="is-active">QR Gen</a>
-        </nav>
-
-        <div class="header-right">
-            <div class="theme-toggle" role="group" aria-label="Theme">
-                <button type="button" data-theme="light" title="Light" aria-label="Light theme">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.2" />
-                        <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
-                            <line x1="8" y1="1.5" x2="8" y2="3" />
-                            <line x1="8" y1="13" x2="8" y2="14.5" />
-                            <line x1="1.5" y1="8" x2="3" y2="8" />
-                            <line x1="13" y1="8" x2="14.5" y2="8" />
-                            <line x1="3.4" y1="3.4" x2="4.5" y2="4.5" />
-                            <line x1="11.5" y1="11.5" x2="12.6" y2="12.6" />
-                            <line x1="3.4" y1="12.6" x2="4.5" y2="11.5" />
-                            <line x1="11.5" y1="4.5" x2="12.6" y2="3.4" />
-                        </g>
-                    </svg>
-                </button>
-                <button type="button" data-theme="system" title="System" aria-label="System theme">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" />
-                        <path d="M8 2 a6 6 0 0 1 0 12 z" fill="currentColor" />
-                    </svg>
-                </button>
-                <button type="button" data-theme="dark" title="Dark" aria-label="Dark theme">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" stroke="currentColor"
-                            stroke-width="1.2" stroke-linejoin="round" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
-
+{% block content %}
     <!-- ═══════════════ Main ═══════════════ -->
     <main class="main">
         <div class="content narrow">
@@ -198,8 +137,7 @@
                     <div>
                         <label class="field-label" for="sizeSlider">Size</label>
                         <div class="slider-wrap">
-                            <input type="range" class="slider" id="sizeSlider" min="128" max="512" step="32"
-                                value="256">
+                            <input type="range" class="slider" id="sizeSlider" min="128" max="512" step="32" value="256">
                             <span class="slider-val" id="sizeVal">256px</span>
                         </div>
                     </div>
@@ -233,8 +171,7 @@
                         <div id="qrcode"></div>
                     </div>
                     <div class="qr-row-meta">
-                        <span class="pill"><span class="dot"></span><span id="metaText">TYPE: TEXT · EC: L ·
-                                256×256</span></span>
+                        <span class="pill"><span class="dot"></span><span id="metaText">TYPE: TEXT · EC: L · 256×256</span></span>
                         <div class="qr-row-actions">
                             <button type="button" class="btn ghost" onclick="downloadQR()">⬇ Download PNG</button>
                             <button type="button" class="btn ghost" onclick="copyQR()">⎘ Copy Image</button>
@@ -245,44 +182,10 @@
 
         </div>
     </main>
+{% endblock %}
 
-    <!-- ═══════════════ Footer ═══════════════ -->
-    <footer class="site-footer">
-        <span>// hrly.sh — <span id="year">2026</span></span>
-        <span>BUILT WITH CAFFEINE &amp; CURIOSITY</span>
-    </footer>
-
-    <!-- ═══════════════ Theme toggle ═══════════════ -->
+{% block scripts %}
     <script>
-        (function () {
-            var KEY = 'site-theme';
-            function apply(v) {
-                if (v === 'light' || v === 'dark') document.documentElement.setAttribute('data-theme', v);
-                else document.documentElement.removeAttribute('data-theme');
-            }
-            function current() { return localStorage.getItem(KEY) || 'system'; }
-            function paint() {
-                var v = current();
-                document.querySelectorAll('.theme-toggle button').forEach(function (b) {
-                    b.classList.toggle('is-active', b.dataset.theme === v);
-                });
-            }
-            document.querySelectorAll('.theme-toggle button').forEach(function (b) {
-                b.addEventListener('click', function () {
-                    var v = b.dataset.theme;
-                    if (v === 'system') localStorage.removeItem(KEY);
-                    else localStorage.setItem(KEY, v);
-                    apply(v); paint();
-                });
-            });
-            paint();
-            document.getElementById('year').textContent = new Date().getFullYear();
-        })();
-    </script>
-
-    <!-- ═══════════════ QR Generator behavior (preserved from your original) ═══════════════ -->
-    <script>
-        // Pre-fill from ?url= when linked from the shortener.
         const _urlParam = new URLSearchParams(window.location.search).get('url');
         if (_urlParam) {
             document.addEventListener('DOMContentLoaded', () => {
@@ -317,16 +220,14 @@
             });
         });
 
-        // Pull the accent value from a CSS var so the "Dark / Accent" preset
-        // matches whatever color the site is themed with.
         function cssVar(name) {
             return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         }
         function colorMap() {
             return {
-                bw: { dark: '#000000', light: '#ffffff' },
+                bw:   { dark: '#000000', light: '#ffffff' },
                 dark: { dark: '#0a0a0a', light: cssVar('--accent') || '#16a34a' },
-                inv: { dark: '#ffffff', light: '#000000' },
+                inv:  { dark: '#ffffff', light: '#000000' },
             };
         }
 
@@ -341,40 +242,33 @@
 
         function buildPayload() {
             switch (currentMode) {
-                case 'text':
-                    return v('inputText') || null;
-
+                case 'text': return v('inputText') || null;
                 case 'contact': {
                     const first = v('c-first'), last = v('c-last');
                     if (!first && !last) return null;
                     let vc = 'BEGIN:VCARD\nVERSION:3.0\n';
                     vc += `N:${last};${first};;;\n`;
                     vc += `FN:${[first, last].filter(Boolean).join(' ')}\n`;
-                    if (v('c-org')) vc += `ORG:${v('c-org')}\n`;
-                    if (v('c-title')) vc += `TITLE:${v('c-title')}\n`;
-                    if (v('c-phone')) vc += `TEL;TYPE=WORK,VOICE:${v('c-phone')}\n`;
-                    if (v('c-mobile')) vc += `TEL;TYPE=CELL:${v('c-mobile')}\n`;
-                    if (v('c-email')) vc += `EMAIL:${v('c-email')}\n`;
+                    if (v('c-org'))     vc += `ORG:${v('c-org')}\n`;
+                    if (v('c-title'))   vc += `TITLE:${v('c-title')}\n`;
+                    if (v('c-phone'))   vc += `TEL;TYPE=WORK,VOICE:${v('c-phone')}\n`;
+                    if (v('c-mobile'))  vc += `TEL;TYPE=CELL:${v('c-mobile')}\n`;
+                    if (v('c-email'))   vc += `EMAIL:${v('c-email')}\n`;
                     if (v('c-website')) vc += `URL:${v('c-website')}\n`;
                     if (v('c-address')) vc += `ADR;TYPE=WORK:;;${v('c-address')};;;;\n`;
                     vc += 'END:VCARD';
                     return vc;
                 }
-
                 case 'wifi': {
                     const ssid = v('w-ssid');
                     if (!ssid) return null;
                     return `WIFI:T:${v('w-security')};S:${ssid};P:${v('w-pass')};;`;
                 }
-
                 case 'email': {
                     const to = v('e-to');
                     if (!to) return null;
-                    const sub = encodeURIComponent(v('e-subject'));
-                    const body = encodeURIComponent(v('e-body'));
-                    return `mailto:${to}?subject=${sub}&body=${body}`;
+                    return `mailto:${to}?subject=${encodeURIComponent(v('e-subject'))}&body=${encodeURIComponent(v('e-body'))}`;
                 }
-
                 case 'sms': {
                     const phone = v('s-phone');
                     if (!phone) return null;
@@ -386,22 +280,16 @@
 
         function generate() {
             const payload = buildPayload();
-            if (!payload) {
-                alert('Please fill in the required fields (marked *).');
-                return;
-            }
+            if (!payload) { alert('Please fill in the required fields (marked *).'); return; }
 
-            const size = parseInt(slider.value);
+            const size   = parseInt(slider.value);
             const colors = colorMap()[document.getElementById('colorMode').value];
             const container = document.getElementById('qrcode');
             container.innerHTML = '';
 
             new QRCode(container, {
-                text: payload,
-                width: size,
-                height: size,
-                colorDark: colors.dark,
-                colorLight: colors.light,
+                text: payload, width: size, height: size,
+                colorDark: colors.dark, colorLight: colors.light,
                 correctLevel: ecMap[selectedEC],
             });
 
@@ -411,7 +299,6 @@
 
             const out = document.getElementById('output');
             out.hidden = false;
-            // Re-run the fadeUp animation each time:
             out.style.animation = 'none';
             void out.offsetWidth;
             out.style.animation = '';
@@ -444,7 +331,4 @@
             });
         }
     </script>
-
-</body>
-
-</html>
+{% endblock %}

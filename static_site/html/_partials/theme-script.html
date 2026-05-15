@@ -1,0 +1,36 @@
+<script>
+(function () {
+    var KEY = 'site-theme';
+    function apply(v) {
+        if (v === 'light' || v === 'dark') document.documentElement.setAttribute('data-theme', v);
+        else document.documentElement.removeAttribute('data-theme');
+    }
+    function current() { return localStorage.getItem(KEY) || 'system'; }
+    function paint() {
+        var v = current();
+        document.querySelectorAll('.theme-toggle button').forEach(function (b) {
+            b.classList.toggle('is-active', b.dataset.theme === v);
+        });
+    }
+    document.querySelectorAll('.theme-toggle button').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var v = b.dataset.theme;
+            if (v === 'system') localStorage.removeItem(KEY);
+            else localStorage.setItem(KEY, v);
+            apply(v); paint();
+        });
+    });
+    paint();
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Mark the current page's nav link as active (progressive enhancement).
+    document.querySelectorAll('.nav a').forEach(function (a) {
+        try {
+            var link = new URL(a.href);
+            if (link.hostname === window.location.hostname &&
+                    link.pathname === window.location.pathname) {
+                a.classList.add('is-active');
+            }
+        } catch (e) {}
+    });
+})();
+</script>

@@ -8,7 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Starting the Stack
 
-All commands run from `traefik/`.
+All `make` commands run from the **repo root**.
+
+**One-time setup:**
+```bash
+make setup          # copies .env.example → .env and url_shortener/.env.example → url_shortener/.env
+# edit .env with your DOMAIN, brand info, etc.
+```
 
 **Local development (first-time cert setup):**
 ```bash
@@ -18,53 +24,63 @@ mkcert -cert-file traefik/certs/dev.localhost.pem \
        dev.localhost "*.dev.localhost" ::1
 ```
 
-**Start (using the example env):**
+**Start everything:**
 ```bash
-cd traefik
-docker compose --env-file .env.example up -d
-```
-
-**Or with your own `.env`:**
-```bash
-cp traefik/.env.example traefik/.env
-# edit .env, then:
-docker compose -f traefik/docker-compose.yml up -d
+make up
 ```
 
 **Verify / Logs:**
 ```bash
-docker compose -f traefik/docker-compose.yml ps
-docker compose -f traefik/docker-compose.yml logs -f traefik
+make ps
+make logs-traefik
+make logs-static
+make logs-shortener
 ```
 
 ## Architecture
 
 ```
+.env.example                  # Single source of truth: DOMAIN, TLS, brand/personal vars
+Makefile                      # Orchestrates all services; passes root .env to every compose call
+
 traefik/
 ├── docker-compose.yml        # Traefik + whoami (dev profile); all routing via Docker labels
-├── .env.example              # Toggle local↔production via these three vars
+├── .env.example              # Stub — points to root .env
 ├── certs/                    # mkcert certs (gitignored *.pem)
 ├── dynamic/
 │   ├── tls.yaml              # File-provider TLS cert paths (local dev only)
 │   └── dashboard-users.htpasswd
 └── letsencrypt/              # acme.json written here at runtime (gitignored)
 
+static_site/                  # nginx landing page at www.<DOMAIN>
+├── docker-compose.yml        # nginx:alpine; SSI enabled via nginx.conf.template; env_file: ../.env
+├── nginx.conf.template       # envsubst-processed at startup; sets SSI + sub_filter rules
+├── .env.example              # Stub — points to root .env
+└── html/
+    ├── _partials/            # Shared HTML fragments (header, footer, theme script)
+    │   ├── header.html       # Nav + theme toggle; {{ HOME_URL }} etc. resolved per-service
+    │   ├── footer.html
+    │   └── theme-script.html # Theme toggle behaviour + active-nav JS
+    ├── css/site.css          # Shared stylesheet loaded cross-origin by url_shortener
+    └── index.html            # Landing page; SSI-includes the partials
+
 url_shortener/                # Django + PostgreSQL URL shortener microservice
-├── docker-compose.yml        # app + db services; joins external `proxy` network
+├── docker-compose.yml        # app + db services; env_file: [../.env, .env]; joins external `proxy` network
 ├── Dockerfile                # python:3.11-slim; runs gunicorn on port 8000
-├── .env.example              # mirrors traefik/.env.example vars + app-specific vars
+├── .env.example              # Service-specific secrets only: DEBUG, DJANGO_SECRET_KEY, DB_*
 ├── manage.py
 ├── requirements.txt
 ├── shortener/                # Django project (wsgi, settings)
 ├── links/                    # URL shortening app (models, views, serializers)
 └── templates/
-    ├── index.html            # URL shortener UI; auto-generates QR after shortening
-    └── qr_generator.html     # Standalone QR generator at /qr/ (text, vCard, Wi-Fi, email, SMS)
+    ├── base.html             # Shared shell: {% include "partials/..." %} for header/footer
+    ├── shortener.html        # {% extends "base.html" %} — URL shortener UI
+    └── qr_generator.html     # {% extends "base.html" %} — standalone QR generator
 ```
 
 ### Dual-mode configuration
 
-The same `docker-compose.yml` handles both environments. The three `.env` keys determine behavior:
+All services share a single root `.env`. The Makefile passes it to every `docker compose` call via `--env-file .env`, and each service's compose file loads it into containers via `env_file: ../.env`. Three keys control the local↔production switch:
 
 | Key | Local dev | Production |
 |---|---|---|
@@ -76,21 +92,14 @@ When `CERT_RESOLVER` is empty, Traefik uses the static cert from `dynamic/tls.ya
 
 ### Adding a new service
 
-Add it to `docker-compose.yml` (or a new compose file that extends the `proxy` network) with Traefik labels, for example:
+When adding a new service, load the root `.env` into it the same way `static_site` does:
 
 ```yaml
-labels:
-  - "traefik.enable=true"
-  - "traefik.http.routers.myapp.rule=Host(`myapp.${DOMAIN}`)"
-  - "traefik.http.routers.myapp.entrypoints=websecure"
-  - "traefik.http.routers.myapp.tls.certresolver=${CERT_RESOLVER}"
-networks:
-  - proxy
+env_file:
+  - ../.env
 ```
 
-Services that don't declare `traefik.enable=true` are invisible to Traefik (Docker provider `exposedByDefault: false`).
-
-The `whoami` service in `traefik/docker-compose.yml` is scoped to the `dev` Docker Compose profile and won't start in production unless `--profile dev` is passed.
+And run it via the Makefile with `--env-file .env` so `${DOMAIN}` and `${CERT_RESOLVER}` are available for compose label interpolation.
 
 ### url_shortener
 
@@ -98,8 +107,7 @@ The first microservice in the stack. Runs Django + Gunicorn behind Traefik at `s
 
 **Start (local dev):**
 ```bash
-cd url_shortener
-docker compose --env-file .env.example up -d --build
+make up-shortener
 ```
 
 **Key behaviours:**
