@@ -11,9 +11,19 @@ services:
       - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.static_site.loadbalancer.server.port=80"
+      # www subdomain — landing page
       - "traefik.http.routers.static_site.rule=Host(`www.${DOMAIN}`)"
       - "traefik.http.routers.static_site.entrypoints=websecure"
       - "traefik.http.routers.static_site.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.static_site.service=static_site"
+      # short subdomain — serves the shortener and QR UI
+      # Lower priority than the Django API router defined in url_shortener/docker-compose.yml
+      - "traefik.http.routers.shortener-ui.rule=Host(`short.${DOMAIN}`)"
+      - "traefik.http.routers.shortener-ui.entrypoints=websecure"
+      - "traefik.http.routers.shortener-ui.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.shortener-ui.service=static_site"
+      - "traefik.http.routers.shortener-ui.priority=1"
     networks:
       - proxy
 
