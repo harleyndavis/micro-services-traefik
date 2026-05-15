@@ -7,6 +7,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-in-production
 
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
+_host = os.getenv("DOMAIN", "localhost")
+
 _allowed = os.getenv("ALLOWED_HOSTS", "").strip()
 ALLOWED_HOSTS = _allowed.split(",") if _allowed else [
     "localhost", "127.0.0.1", f"short.{_host}",
@@ -82,7 +84,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-_host = os.getenv("DOMAIN", "localhost")
 # Absolute URLs for cross-subdomain navigation, shared with the nginx static site
 # via context processor so templates never hardcode the domain.
 HOME_URL      = f"https://www.{_host}"
