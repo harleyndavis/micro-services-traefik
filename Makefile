@@ -30,22 +30,22 @@ down: down-shortener down-static down-traefik
 # ── Individual service targets ─────────────────────────────────────────────────
 
 up-traefik:
-	docker compose --env-file .env --project-directory traefik -f traefik/docker-compose.yml up -d
+	docker compose --env-file .env --project-name traefik -f traefik/docker-compose.yml up -d
 
 up-static:
-	docker compose --env-file .env --project-directory static_site -f static_site/docker-compose.yml up -d
+	docker compose --env-file .env --project-name static_site -f static_site/docker-compose.yml up -d
 
 up-shortener:
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml up -d --build
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml up -d --build
 
 down-traefik:
-	docker compose --env-file .env --project-directory traefik -f traefik/docker-compose.yml down
+	docker compose --env-file .env --project-name traefik -f traefik/docker-compose.yml down
 
 down-static:
-	docker compose --env-file .env --project-directory static_site -f static_site/docker-compose.yml down
+	docker compose --env-file .env --project-name static_site -f static_site/docker-compose.yml down
 
 down-shortener:
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml down
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml down
 
 # ── Restart ────────────────────────────────────────────────────────────────────
 
@@ -74,12 +74,12 @@ setup: .env $(SERVICE_ENVS)
 
 superuser:
 ifeq ($(SUPER_PASS),)
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml exec \
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml exec \
 		-e DJANGO_SUPERUSER_USERNAME=$(SUPER_USER) \
 		-e DJANGO_SUPERUSER_EMAIL=$(SUPER_EMAIL) \
 		app python manage.py createsuperuser
 else
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml exec \
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml exec \
 		-e DJANGO_SUPERUSER_USERNAME=$(SUPER_USER) \
 		-e DJANGO_SUPERUSER_EMAIL=$(SUPER_EMAIL) \
 		-e DJANGO_SUPERUSER_PASSWORD=$(SUPER_PASS) \
@@ -90,9 +90,9 @@ endif
 
 # Remove containers, orphans, and locally built images — volumes are preserved
 clean:
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml down --remove-orphans --rmi local
-	docker compose --env-file .env --project-directory static_site -f static_site/docker-compose.yml down --remove-orphans
-	docker compose --env-file .env --project-directory traefik -f traefik/docker-compose.yml down --remove-orphans
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml down --remove-orphans --rmi local
+	docker compose --env-file .env --project-name static_site -f static_site/docker-compose.yml down --remove-orphans
+	docker compose --env-file .env --project-name traefik -f traefik/docker-compose.yml down --remove-orphans
 
 # Remove containers, orphans, and ALL named volumes — destroys the database
 clean-data:
@@ -101,34 +101,34 @@ ifeq ($(OS),Windows_NT)
 else
 	@read -p "WARNING: This deletes all volumes including the PostgreSQL database. Type 'yes' to continue: " confirm; if [ "$$confirm" != "yes" ]; then echo "Aborted."; exit 1; fi
 endif
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml down -v --remove-orphans
-	docker compose --env-file .env --project-directory static_site -f static_site/docker-compose.yml down -v --remove-orphans
-	docker compose --env-file .env --project-directory traefik -f traefik/docker-compose.yml down -v --remove-orphans
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml down -v --remove-orphans
+	docker compose --env-file .env --project-name static_site -f static_site/docker-compose.yml down -v --remove-orphans
+	docker compose --env-file .env --project-name traefik -f traefik/docker-compose.yml down -v --remove-orphans
 
 # ── Build ──────────────────────────────────────────────────────────────────────
 
 # Only url_shortener has a Dockerfile; traefik and static_site use upstream images
 build:
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml build
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml build
 
 # ── Status & logs ──────────────────────────────────────────────────────────────
 
 ps:
 	@echo "--- traefik ---"
-	@docker compose --env-file .env --project-directory traefik -f traefik/docker-compose.yml ps
+	@docker compose --env-file .env --project-name traefik -f traefik/docker-compose.yml ps
 	@echo "--- static_site ---"
-	@docker compose --env-file .env --project-directory static_site -f static_site/docker-compose.yml ps
+	@docker compose --env-file .env --project-name static_site -f static_site/docker-compose.yml ps
 	@echo "--- url_shortener ---"
-	@docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml ps
+	@docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml ps
 
 logs-traefik:
-	docker compose --env-file .env --project-directory traefik -f traefik/docker-compose.yml logs -f
+	docker compose --env-file .env --project-name traefik -f traefik/docker-compose.yml logs -f
 
 logs-static:
-	docker compose --env-file .env --project-directory static_site -f static_site/docker-compose.yml logs -f
+	docker compose --env-file .env --project-name static_site -f static_site/docker-compose.yml logs -f
 
 logs-shortener:
-	docker compose --env-file .env --project-directory url_shortener -f url_shortener/docker-compose.yml logs -f
+	docker compose --env-file .env --project-name url_shortener -f url_shortener/docker-compose.yml logs -f
 
 # ── Help ───────────────────────────────────────────────────────────────────────
 

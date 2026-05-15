@@ -7,7 +7,10 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-in-production
 
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+_allowed = os.getenv("ALLOWED_HOSTS", "").strip()
+ALLOWED_HOSTS = _allowed.split(",") if _allowed else [
+    "localhost", "127.0.0.1", f"short.{_host}",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -95,12 +98,21 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CORS_ALLOWED_ORIGINS = os.getenv(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1"
-).split(",")
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS", "http://localhost,http://127.0.0.1"
-).split(",")
+_cors = os.getenv("CORS_ALLOWED_ORIGINS", "").strip()
+CORS_ALLOWED_ORIGINS = _cors.split(",") if _cors else [
+    f"https://short.{_host}",
+    f"https://www.{_host}",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
+CSRF_TRUSTED_ORIGINS = _csrf.split(",") if _csrf else [
+    f"https://short.{_host}",
+    f"https://www.{_host}",
+    "http://localhost",
+    "http://127.0.0.1",
+]
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",

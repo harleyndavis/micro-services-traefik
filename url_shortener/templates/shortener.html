@@ -117,12 +117,11 @@
 
                 const data = await response.json();
                 shortUrlInput.value = data.short_url;
+                generateQRCode(data.short_url);
                 resultDiv.hidden = false;
                 resultDiv.style.animation = 'none';
                 void resultDiv.offsetWidth;
                 resultDiv.style.animation = '';
-
-                generateQRCode(data.short_url);
                 urlInput.value = '';
                 updateStats();
             } catch (err) {

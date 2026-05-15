@@ -4,6 +4,8 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
+    environment:
+      SITE_NAME: ${SITE_NAME:-${DOMAIN}}
     volumes:
       - ./html:/usr/share/nginx/html:ro
       - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro

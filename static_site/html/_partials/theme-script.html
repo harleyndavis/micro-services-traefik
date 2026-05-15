@@ -1,11 +1,27 @@
 <script>
 (function () {
     var KEY = 'site-theme';
+    // Strip the first subdomain label so the cookie is shared across all subdomains.
+    var rootDomain = window.location.hostname.replace(/^[^.]+\./, '');
+
+    function getCookie() {
+        var m = document.cookie.match(/(?:^|; )site-theme=([^;]*)/);
+        return m ? decodeURIComponent(m[1]) : null;
+    }
+    function setCookie(value) {
+        var exp = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = KEY + '=' + encodeURIComponent(value) +
+                          '; expires=' + exp + '; path=/; domain=.' + rootDomain + '; SameSite=Lax';
+    }
+    function removeCookie() {
+        document.cookie = KEY + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.' + rootDomain;
+    }
+
     function apply(v) {
         if (v === 'light' || v === 'dark') document.documentElement.setAttribute('data-theme', v);
         else document.documentElement.removeAttribute('data-theme');
     }
-    function current() { return localStorage.getItem(KEY) || 'system'; }
+    function current() { return getCookie() || 'system'; }
     function paint() {
         var v = current();
         document.querySelectorAll('.theme-toggle button').forEach(function (b) {
@@ -15,14 +31,13 @@
     document.querySelectorAll('.theme-toggle button').forEach(function (b) {
         b.addEventListener('click', function () {
             var v = b.dataset.theme;
-            if (v === 'system') localStorage.removeItem(KEY);
-            else localStorage.setItem(KEY, v);
+            if (v === 'system') removeCookie();
+            else setCookie(v);
             apply(v); paint();
         });
     });
     paint();
     document.getElementById('year').textContent = new Date().getFullYear();
-    // Mark the current page's nav link as active (progressive enhancement).
     document.querySelectorAll('.nav a').forEach(function (a) {
         try {
             var link = new URL(a.href);

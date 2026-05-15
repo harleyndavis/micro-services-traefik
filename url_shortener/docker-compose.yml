@@ -20,10 +20,6 @@ services:
     env_file:
       - ../.env
       - .env
-    environment:
-      ALLOWED_HOSTS: "localhost,127.0.0.1,short.${DOMAIN:-dev.localhost}"
-      CORS_ALLOWED_ORIGINS: "https://short.${DOMAIN:-dev.localhost},http://localhost:3000,http://127.0.0.1:3000"
-      CSRF_TRUSTED_ORIGINS: "https://short.${DOMAIN:-dev.localhost},http://localhost,http://127.0.0.1"
     depends_on:
       db:
         condition: service_healthy
@@ -31,7 +27,7 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.shortener.rule=Host(`short.${DOMAIN:-dev.localhost}`)"
+      - "traefik.http.routers.shortener.rule=Host(`short.${DOMAIN}`)"
       - "traefik.http.routers.shortener.entrypoints=websecure"
       - "traefik.http.routers.shortener.tls=true"
       - "traefik.http.routers.shortener.tls.certresolver=${CERT_RESOLVER:-}"

@@ -68,7 +68,7 @@
   color-scheme: light;
 }
 
-html, body { height: 100%; }
+html, body { min-height: 100%; }
 body {
   min-height: 100vh;
   margin: 0;
@@ -447,12 +447,16 @@ textarea.input { resize: vertical; min-height: 90px; line-height: 1.5; }
  * ────────────────────────────────────────────── */
 .qr-frame {
   position: relative;
-  background: #fff;
+  background: var(--surface);
   padding: 16px;
   border-radius: 6px;
   box-shadow: 0 0 0 1px var(--border),
               0 0 50px color-mix(in oklab, var(--accent) 12%, transparent);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 148px;
+  min-height: 148px;
 }
 .qr-frame::before,
 .qr-frame::after {

@@ -8,7 +8,8 @@
     <!-- Apply stored theme BEFORE first paint to avoid a flash. -->
     <script>
       (function () {
-        var v = localStorage.getItem('site-theme');
+        var m = document.cookie.match(/(?:^|; )site-theme=([^;]*)/);
+        var v = m ? decodeURIComponent(m[1]) : null;
         if (v === 'light' || v === 'dark') {
           document.documentElement.setAttribute('data-theme', v);
         }
