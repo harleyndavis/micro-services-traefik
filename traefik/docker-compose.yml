@@ -60,24 +60,14 @@ services:
       - "traefik.enable=true"
 
       # Dashboard router
-      - "traefik.http.routers.dashboard.rule=(Host(`dashboard.${DOMAIN}`) || (Host(`${DOMAIN}`)) && (PathPrefix(`/dashboard/`) || PathPrefix(`/api`)))"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.${DOMAIN}`)"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
-
-      # Redirect /dashboard to /dashboard/
-      - "traefik.http.routers.dashboard-redirect.rule=(Host(`${DOMAIN}`)) && Path(`/dashboard`)"
-      - "traefik.http.routers.dashboard-redirect.entrypoints=websecure"
-      - "traefik.http.routers.dashboard-redirect.tls=true"
-      - "traefik.http.routers.dashboard-redirect.service=noop@internal"
-      - "traefik.http.routers.dashboard-redirect.middlewares=dashboard-slash@docker"
-      - "traefik.http.middlewares.dashboard-slash.redirectregex.regex=^https://([^/]+)/dashboard$"
-      - "traefik.http.middlewares.dashboard-slash.redirectregex.replacement=https://$${1}/dashboard/"
-      - "traefik.http.middlewares.dashboard-slash.redirectregex.permanent=true"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"
 
       # Basic‑auth middleware
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/dynamic/dashboard-users.htpasswd"
-      - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"
 
   # Whoami application — only started when the "dev" profile is active
   whoami:
@@ -89,7 +79,7 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=(Host(`whoami.${DOMAIN}`) || (Host(`${DOMAIN}`)) && PathPrefix(`/whoami`))"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls=true"
 
