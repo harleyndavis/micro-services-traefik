@@ -28,7 +28,7 @@ services:
       - "traefik.http.routers.shortener.rule=Host(`short.${DOMAIN}`)"
       - "traefik.http.routers.shortener.entrypoints=websecure"
       - "traefik.http.routers.shortener.tls=true"
-      - "traefik.http.routers.shortener.tls.certresolver=${CERT_RESOLVER:-}"
+      - "traefik.http.routers.shortener.tls.certresolver=${CERT_RESOLVER}"
       - "traefik.http.services.shortener.loadbalancer.server.port=8000"
     volumes:
       - ./:/app

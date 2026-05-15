@@ -28,7 +28,7 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.websecure.http.tls=true"
-      - "--entrypoints.websecure.http.tls.certresolver=${CERT_RESOLVER:-}"
+      - "--entrypoints.websecure.http.tls.certresolver=${CERT_RESOLVER}"
 
       # Attach the static configuration tls.yaml file that contains the tls configuration settings
       - "--providers.file.filename=/dynamic/tls.yaml"
@@ -41,7 +41,7 @@ services:
       # TLS Certificate Resolver — Let's Encrypt
       # Set ACME_EMAIL and CERT_RESOLVER=letsencrypt in .env for production.
       # Leave both empty for local dev (file-provider certs from ./certs are used instead).
-      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-}"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
 
@@ -60,13 +60,13 @@ services:
       - "traefik.enable=true"
 
       # Dashboard router
-      - "traefik.http.routers.dashboard.rule=(Host(`dashboard.${DOMAIN:-localhost}`) || (Host(`${DOMAIN:-localhost}`)) && (PathPrefix(`/dashboard/`) || PathPrefix(`/api`)))"
+      - "traefik.http.routers.dashboard.rule=(Host(`dashboard.${DOMAIN}`) || (Host(`${DOMAIN}`)) && (PathPrefix(`/dashboard/`) || PathPrefix(`/api`)))"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
 
       # Redirect /dashboard to /dashboard/
-      - "traefik.http.routers.dashboard-redirect.rule=(Host(`${DOMAIN:-localhost}`)) && Path(`/dashboard`)"
+      - "traefik.http.routers.dashboard-redirect.rule=(Host(`${DOMAIN}`)) && Path(`/dashboard`)"
       - "traefik.http.routers.dashboard-redirect.entrypoints=websecure"
       - "traefik.http.routers.dashboard-redirect.tls=true"
       - "traefik.http.routers.dashboard-redirect.service=noop@internal"
@@ -89,7 +89,7 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=(Host(`whoami.${DOMAIN:-localhost}`) || (Host(`${DOMAIN:-localhost}`)) && PathPrefix(`/whoami`))"
+      - "traefik.http.routers.whoami.rule=(Host(`whoami.${DOMAIN}`) || (Host(`${DOMAIN}`)) && PathPrefix(`/whoami`))"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls=true"
 

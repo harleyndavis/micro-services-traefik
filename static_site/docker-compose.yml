@@ -13,7 +13,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.static_site.rule=Host(`www.${DOMAIN}`)"
       - "traefik.http.routers.static_site.entrypoints=websecure"
-      - "traefik.http.routers.static_site.tls.certresolver=${CERT_RESOLVER:-}"
+      - "traefik.http.routers.static_site.tls.certresolver=${CERT_RESOLVER}"
     networks:
       - proxy
 
