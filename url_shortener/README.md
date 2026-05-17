@@ -75,7 +75,7 @@ Response:
   "id": 1,
   "original_url": "https://example.com/very/long/url",
   "short_code": "abc123",
-  "short_url": "https://short.dev.localhost/api/s/abc123",
+  "short_url": "https://short.dev.localhost/s/abc123",
   "clicks": 0,
   "qr_scans": 0,
   "created_at": "2026-05-01T12:00:00Z"
@@ -118,21 +118,14 @@ curl -L "https://short.dev.localhost/s/abc123?src=qr"
 ```
 url_shortener/
 ├── shortener/              # Django project config
-│   ├── settings.py         # Settings (uses env vars); derives HOME_URL, SHORTENER_URL, QR_URL from DOMAIN
-│   ├── context_processors.py  # Injects URL vars into every template via TEMPLATES context_processors
-│   ├── urls.py             # URL routing
+│   ├── settings.py         # Settings (uses env vars); derives ALLOWED_HOSTS etc. from DOMAIN
+│   ├── urls.py             # URL routing: /api/, /admin/, /s/<code>, /static/
 │   └── wsgi.py             # WSGI entry point
 ├── links/                  # URL shortening app
 │   ├── models.py           # Link model with short code generation
 │   ├── serializers.py      # DRF serializers
-│   ├── views.py            # API views
+│   ├── views.py            # API views + redirect logic
 │   └── urls.py             # App-level routing
-├── templates/
-│   ├── base.html           # Base shell: loads site.css cross-origin; {% include %}s header/footer/theme-script partials
-│   ├── shortener.html      # {% extends "base.html" %} — URL shortener UI at /
-│   ├── qr_generator.html   # {% extends "base.html" %} — standalone QR generator at /qr/
-│   └── partials/           # Mounted read-only from ../static_site/html/_partials/ at runtime
-├── static/                 # Source static files (served via collectstatic)
 ├── manage.py               # Django CLI
 ├── Dockerfile              # Container image definition
 ├── docker-compose.yml      # Compose stack (app + postgres)
@@ -140,26 +133,23 @@ url_shortener/
 └── requirements.txt        # Python dependencies
 ```
 
-### Template inheritance and shared partials
+### What Django serves
 
-All pages extend `base.html`, which provides the HTML shell, loads `site.css` from the static site, and includes the shared header, footer, and theme script via `{% include %}`. Page templates only define their unique content:
+Django handles only backend concerns — the UI is served by the `static_site` nginx container:
 
-```html
-{% extends "base.html" %}
-{% block title %}My Page · {{ SITE_NAME }}{% endblock %}
-{% block content %}<main>...</main>{% endblock %}
-{% block scripts %}<script>/* page-specific JS */</script>{% endblock %}
-```
+| Path | Handler |
+|---|---|
+| `/api/` | DRF API (shorten, list, stats) |
+| `/admin/` | Django admin |
+| `/s/<code>` | Redirect to original URL; tracks clicks / QR scans |
+| `/static/` | Collected static files (admin CSS/JS via WhiteNoise) |
 
-The `partials/` directory inside `templates/` is not checked in — it is volume-mounted at runtime from `../static_site/html/_partials/`. This means header, footer, and theme-script changes in the static site are instantly reflected in the Django app without rebuilding the image.
-
-Navigation URLs (`HOME_URL`, `SHORTENER_URL`, `QR_URL`, `ASSETS_URL`) are injected into every template automatically by the `assets_url` context processor, derived from the `DOMAIN` environment variable.
+Traefik routes these paths to Django at priority 10. Everything else on `short.<DOMAIN>` falls through to nginx at priority 1, serving `static_site/html/shortener/`.
 
 ### Volumes
 
 - `./:/app` — bind-mounts source code for live reloading during development
 - `staticfiles:/app/staticfiles` — named volume; `collectstatic` writes here at startup so the bind-mount's host permissions don't interfere
-- `../static_site/html/_partials:/app/templates/partials:ro` — shared HTML partials from the static site; read-only
 - `postgres_data:/var/lib/postgresql/data` — persistent database storage
 
 ## Development

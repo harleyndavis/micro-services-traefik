@@ -113,7 +113,7 @@ Response:
   "id": 1,
   "original_url": "https://github.com/python/cpython",
   "short_code": "aBc12D",
-  "short_url": "https://short.dev.localhost/api/s/aBc12D",
+  "short_url": "https://short.dev.localhost/s/aBc12D",
   "clicks": 0,
   "qr_scans": 0,
   "created_at": "2026-05-01T12:00:00Z"

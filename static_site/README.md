@@ -1,12 +1,14 @@
 # static_site
 
-An nginx container serving the `www.<host>` landing page. It hosts the shared `site.css` stylesheet and the shared HTML partials (header, footer, theme script) that are consumed by both this site and the `url_shortener` service, keeping all services visually consistent from a single source of truth.
+An nginx container serving the `www.<host>` landing page and the `short.<host>` UI pages (URL shortener and QR generator). It hosts the shared `site.css` stylesheet and shared HTML partials (header, footer, theme script) that are the single source of truth for UI consistency across the stack.
 
 ## What it serves
 
 - `www.<DOMAIN>` — the main landing page (`html/index.html`)
-- `www.<DOMAIN>/css/site.css` — shared stylesheet (loaded cross-origin by url_shortener templates)
-- `html/_partials/` — shared HTML fragments (header, footer, theme script); served internally via nginx SSI and volume-mounted read-only into the url_shortener container for Django template inclusion
+- `www.<DOMAIN>/css/site.css` — shared stylesheet loaded by all pages in the stack
+- `short.<DOMAIN>/` — URL shortener UI (`html/shortener/index.html`); calls the Django API at `/api/`
+- `short.<DOMAIN>/qr/` — standalone QR generator (`html/shortener/qr/index.html`)
+- `html/_partials/` — shared HTML fragments (header, footer, theme script); served internally via nginx SSI
 
 All files under `html/` are served read-only; no build step is needed.
 
@@ -20,12 +22,11 @@ The `html/_partials/` directory contains HTML fragments that are the single sour
 | `_partials/footer.html` | Site footer with copyright year |
 | `_partials/theme-script.html` | Theme toggle logic, year update, and active-nav highlighting |
 
-### How partials are resolved per service
+### How partials are resolved
 
-Partials use `{{ HOME_URL }}`, `{{ SHORTENER_URL }}`, and `{{ QR_URL }}` as placeholders. Each service resolves them natively:
+Partials use `{{ HOME_URL }}`, `{{ SHORTENER_URL }}`, and `{{ QR_URL }}` as placeholders. nginx resolves them at request time:
 
-- **static_site (nginx)**: `nginx.conf.template` is processed by `envsubst` at container startup, baking `${DOMAIN}` into the nginx config. Then nginx's `sub_filter` replaces the `{{ }}` placeholders in assembled SSI output with absolute URLs derived from `DOMAIN`.
-- **url_shortener (Django)**: The `_partials/` directory is volume-mounted into the container at `templates/partials/`. Django's `{% include %}` pulls in the files, and the template engine replaces `{{ HOME_URL }}` etc. using context variables injected by the `assets_url` context processor in `shortener/context_processors.py`.
+`nginx.conf.template` is processed by `envsubst` at container startup, baking `${DOMAIN}` into the nginx config. nginx's `sub_filter` then replaces the `{{ }}` placeholders in the assembled SSI output with absolute URLs derived from `DOMAIN`. This applies to both the `www` and `short` server blocks.
 
 ### nginx.conf.template
 

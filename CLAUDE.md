@@ -52,30 +52,30 @@ traefik/
 │   └── dashboard-users.htpasswd
 └── letsencrypt/              # acme.json written here at runtime (gitignored)
 
-static_site/                  # nginx landing page at www.<DOMAIN>
+static_site/                  # nginx serving www.<DOMAIN> and short.<DOMAIN> UI
 ├── docker-compose.yml        # nginx:alpine; SSI enabled via nginx.conf.template; env_file: ../.env
-├── nginx.conf.template       # envsubst-processed at startup; sets SSI + sub_filter rules
+├── nginx.conf.template       # envsubst-processed at startup; two server blocks (www + short)
 ├── .env.example              # Stub — points to root .env
 └── html/
     ├── _partials/            # Shared HTML fragments (header, footer, theme script)
-    │   ├── header.html       # Nav + theme toggle; {{ HOME_URL }} etc. resolved per-service
+    │   ├── header.html       # Nav + theme toggle; {{ HOME_URL }} etc. resolved via sub_filter
     │   ├── footer.html
     │   └── theme-script.html # Theme toggle behaviour + active-nav JS
-    ├── css/site.css          # Shared stylesheet loaded cross-origin by url_shortener
-    └── index.html            # Landing page; SSI-includes the partials
+    ├── css/site.css          # Shared stylesheet; loaded by all pages including shortener UI
+    ├── index.html            # Landing page at www.<DOMAIN>; SSI-includes the partials
+    └── shortener/            # Shortener UI pages served at short.<DOMAIN>
+        ├── index.html        # URL shortener UI; calls /api/ and /s/ on the same host
+        └── qr/
+            └── index.html    # Standalone QR generator at short.<DOMAIN>/qr/
 
-url_shortener/                # Django + PostgreSQL URL shortener microservice
+url_shortener/                # Django + PostgreSQL URL shortener microservice (API + redirects only)
 ├── docker-compose.yml        # app + db services; env_file: [../.env, .env]; joins external `proxy` network
 ├── Dockerfile                # python:3.11-slim; runs gunicorn on port 8000
 ├── .env.example              # Service-specific secrets only: DEBUG, DJANGO_SECRET_KEY, DB_*
 ├── manage.py
 ├── requirements.txt
 ├── shortener/                # Django project (wsgi, settings)
-├── links/                    # URL shortening app (models, views, serializers)
-└── templates/
-    ├── base.html             # Shared shell: {% include "partials/..." %} for header/footer
-    ├── shortener.html        # {% extends "base.html" %} — URL shortener UI
-    └── qr_generator.html     # {% extends "base.html" %} — standalone QR generator
+└── links/                    # URL shortening app (models, views, serializers)
 ```
 
 ### Dual-mode configuration
@@ -111,21 +111,22 @@ make up-shortener
 ```
 
 **Key behaviours:**
+- Django serves only the API (`/api/`), admin (`/admin/`), short-link redirects (`/s/<code>`), and static assets (`/static/`). The shortener and QR generator UI pages are served by the `static_site` nginx container.
+- Traefik uses a split-routing pattern: the `shortener-api` router (priority 10) catches the four Django paths; the `shortener-ui` router (priority 1) catches everything else on `short.<DOMAIN>` and sends it to nginx.
 - `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` are all derived from `DOMAIN` — no manual list needed.
-- `HOME_URL` is also derived from `DOMAIN` as `https://www.{DOMAIN}` and injected into every template via the context processor. Nav "Home" links and the brand link point here so they exit the shortener subdomain to the main site. No separate env var required.
 - `staticfiles` is a named Docker volume shared between the build step and the running container to avoid bind-mount permission errors.
 - The `db` healthcheck uses `pg_isready -U <user> -d <dbname>` so the app waits for the correct database, not just the server process.
 - `CERT_RESOLVER` is set on the router label (`tls.certresolver=${CERT_RESOLVER:-}`); an empty value disables ACME and falls back to the Traefik file-provider cert.
 
 ### QR code integration
 
-QR codes are generated client-side using `qrcodejs` (loaded from CDN).
+QR codes are generated client-side using `qrcodejs` (loaded from CDN). Both UI pages live in `static_site/html/shortener/` and are served by nginx.
 
-**Shortener UI (`/`):** After a URL is shortened, a QR code is auto-generated inline. The encoded URL is `<short_url>?src=qr` so scans are tracked separately from direct link clicks in the `Link.qr_scans` field. The stats box shows QR Scans alongside Total Links and Total Clicks.
+**Shortener UI (`short.<DOMAIN>/`):** After a URL is shortened via `/api/links/shorten/`, a QR code is auto-generated inline. The encoded URL is `<short_url>?src=qr` so scans are tracked separately from direct link clicks in the `Link.qr_scans` field. The stats box shows QR Scans alongside Total Links and Total Clicks.
 
-**Standalone generator (`/qr/`):** Full-featured QR generator supporting text/URL, vCard, Wi-Fi, email, and SMS payloads. Accepts a `?url=` query parameter — the shortener's "Full Generator" button links here with the short URL pre-filled and auto-generated.
+**Standalone generator (`short.<DOMAIN>/qr/`):** Full-featured QR generator supporting text/URL, vCard, Wi-Fi, email, and SMS payloads. Accepts a `?url=` query parameter — the shortener's "Full Generator" button links here with the short URL pre-filled and auto-generated.
 
-**Tracking:** The redirect view at `/s/<code>` checks `?src=qr` and increments `qr_scans` instead of `clicks`. The `/api/links/stats/` endpoint exposes `total_qr_scans`.
+**Tracking:** The redirect view at `/s/<code>` (Django) checks `?src=qr` and increments `qr_scans` instead of `clicks`. The `/api/links/stats/` endpoint exposes `total_qr_scans`.
 
 ## Branching Conventions
 

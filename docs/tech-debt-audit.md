@@ -1,6 +1,6 @@
 # Tech Debt Audit — Traefik Microservices Stack
 
-**Updated:** 2026-05-14
+**Updated:** 2026-05-17
 **Scope:** traefik · static_site · url_shortener · root-level
 **Method:** Priority = (Impact + Risk) × (6 − Effort)
 
@@ -21,6 +21,7 @@ These were identified in the original 2026-04-30 audit and have since been addre
 | `CLAUDE.md` references non-existent `entrypoint.sh` | Removed 2026-05-14 |
 | `static_site` undocumented | `static_site/README.md` created 2026-05-14 |
 | `ASSETS_URL` redundant env var | Derived from `DOMAIN` in `settings.py`; removed from `docker-compose.yml` 2026-05-14 |
+| Django serving shortener and QR generator HTML | Migrated to static nginx container; Django now handles API, admin, redirects, and static assets only. Context processor, templates, partials bind-mount, and `STATICFILES_DIRS` removed 2026-05-17 |
 
 ---
 
