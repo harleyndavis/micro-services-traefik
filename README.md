@@ -59,7 +59,7 @@ Individual services: `make up-traefik`, `make up-static`, `make up-shortener`, e
 
 | Service | Host | Description |
 |---|---|---|
-| Traefik dashboard | `<host>/dashboard/` | Routing UI, basic auth protected |
+| Traefik dashboard | `dashboard.<host>` | Routing UI, basic auth protected |
 | static_site | `www.<host>` | nginx landing page |
 | url_shortener | `short.<host>` | Django URL shortener with QR codes |
 
@@ -155,8 +155,7 @@ docker compose --env-file .env -f docker-compose.yml up -d
 
 ### 5. Verify
 
-- `https://dev.localhost/dashboard/` — prompts for basic auth and loads the Traefik UI
-- `https://dev.localhost/api/overview` — responds through the same router
+- `https://dashboard.dev.localhost/` — prompts for basic auth and loads the Traefik UI
 - `https://whoami.dev.localhost/` — reaches the test container
 
 ---
@@ -268,8 +267,7 @@ docker compose logs -f traefik
 
 Then verify:
 
-- `https://example.com/dashboard/` — prompts for basic auth and loads the Traefik UI
-- `https://example.com/api/overview` — responds through the same router
+- `https://dashboard.example.com/` — prompts for basic auth and loads the Traefik UI
 - `https://whoami.example.com/` — reaches the test container
 
 ### Production Readiness
@@ -284,7 +282,7 @@ For a starting follow-up checklist, see `docs/production-hardening.md`.
 
 ## Notes
 
-- The dashboard router matches both `/dashboard/` and `/api` — both paths are required for the dashboard UI to function correctly.
+- The dashboard router serves `api@internal` at `dashboard.<DOMAIN>` — this covers both the UI and the `/api` paths the UI depends on.
 - `docs/automating-deployment-summary.md` contains broader deployment notes, but this README is the source of truth for the Traefik stack.
 - See `static_site/README.md` for the landing page service.
 - See `url_shortener/README.md` for the URL shortener (QR codes, API docs, dev tips).
